@@ -1,45 +1,54 @@
+"use client";
+
 import Link from "next/link";
 import { Mail, MapPin, Phone, Send } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { content } from "@/i18n/site-content";
+import { getLocaleFromPath, localizedPath } from "@/i18n/routing";
 import { site } from "@/lib/site";
 
-const footerLinks = [
-  { href: "/products", label: "产品中心" },
-  { href: "/custom-injection-molding", label: "注塑定制服务" },
-  { href: "/factory-capability", label: "工厂实力" },
-  { href: "/contact", label: "联系我们" }
-];
-
 export function Footer() {
+  const pathname = usePathname();
+  const locale = getLocaleFromPath(pathname);
+  const copy = content[locale];
+
   return (
-    <footer className="border-t border-slate-200 bg-white">
+    <footer className="border-t border-slate-200/80 bg-white">
       <div className="section-shell py-12">
-        <div className="grid gap-8 rounded-[2rem] border border-slate-200 bg-slate-50 p-6 md:grid-cols-[1.35fr_0.85fr_1fr] lg:p-8">
-          <div>
-            <div className="text-lg font-semibold text-slate-950">{site.name}</div>
-            <div className="mt-2 text-sm uppercase tracking-[0.18em] text-slate-500">{site.englishName}</div>
-            <p className="mt-5 max-w-xl text-sm leading-7 text-slate-600">
-              专注塑料件注塑加工、来图来样定制、小批量试产与 OEM 代工，面向汽配、电子电器、家具、宠物用品等行业提供稳定交付。
-            </p>
+        <div className="relative overflow-hidden rounded-[2rem] border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-sky-50 p-6 shadow-[0_28px_100px_rgba(15,23,42,0.08)] md:grid md:grid-cols-[1.25fr_0.85fr_1fr] md:gap-8 lg:p-8">
+          <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-sky-200/35 blur-3xl" />
+          <div className="relative">
+            <div className="text-lg font-semibold text-slate-950">
+              {locale === "zh" ? site.name : site.englishName}
+            </div>
+            <div className="mt-2 text-sm uppercase tracking-[0.18em] text-slate-500">Jincong Manufacturing</div>
+            <p className="mt-5 max-w-xl text-sm leading-7 text-slate-600">{copy.footer.summary}</p>
             <Link
-              href="/contact"
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-700"
+              href={localizedPath(locale, "/contact")}
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-sky-700"
             >
               <Send className="h-4 w-4" />
-              提交定制需求
+              {copy.contact.submit}
             </Link>
           </div>
-          <div>
-            <div className="text-sm font-semibold text-slate-950">快速入口</div>
+
+          <div className="relative mt-8 md:mt-0">
+            <div className="text-sm font-semibold text-slate-950">{locale === "zh" ? "快速入口" : "Quick Links"}</div>
             <div className="mt-4 grid gap-3">
-              {footerLinks.map((item) => (
-                <Link key={item.href} href={item.href} className="text-sm text-slate-600 transition hover:text-sky-700">
+              {copy.nav.slice(1, 6).map((item) => (
+                <Link
+                  key={item.href}
+                  href={localizedPath(locale, item.href)}
+                  className="text-sm text-slate-600 transition hover:text-sky-700"
+                >
                   {item.label}
                 </Link>
               ))}
             </div>
           </div>
-          <div>
-            <div className="text-sm font-semibold text-slate-950">联系信息</div>
+
+          <div className="relative mt-8 md:mt-0">
+            <div className="text-sm font-semibold text-slate-950">{locale === "zh" ? "联系信息" : "Contact"}</div>
             <div className="mt-4 grid gap-3 text-sm text-slate-700">
               <span className="flex items-start gap-2">
                 <Phone className="mt-0.5 h-4 w-4 shrink-0 text-sky-600" />
@@ -58,7 +67,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-slate-200 py-5 text-center text-xs text-slate-500">
-        © {new Date().getFullYear()} {site.name}. All rights reserved.
+        © {new Date().getFullYear()} {locale === "zh" ? site.name : site.englishName}. All rights reserved.
       </div>
     </footer>
   );

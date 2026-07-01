@@ -21,8 +21,8 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
   const product = getCatalogProductById(slug);
   if (product) {
     return {
-      title: `${product.nameZh} | 注塑加工定制`,
-      description: `${product.nameZh}属于${product.categoryZh}，支持来图来样定制、小批量试产、OEM代工和工厂直供。`
+      title: `${product.nameEn} | Custom Injection Molding`,
+      description: `${product.nameEn} in ${product.categoryEn}, available for drawing/sample customization, small-batch trial production and OEM.`
     };
   }
 
@@ -30,12 +30,12 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
   if (!legacyProduct) return {};
 
   return {
-    title: `${legacyProduct.name} | 注塑加工定制`,
-    description: `${legacyProduct.name}支持来图来样定制、小批量试产、OEM代工和工厂直供。`
+    title: `${legacyProduct.englishName} | Custom Injection Molding`,
+    description: `${legacyProduct.englishName} supports custom injection molding and OEM processing.`
   };
 }
 
-export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
+export default async function EnglishProductDetailPage({ params }: ProductDetailPageProps) {
   const { slug } = await params;
-  return <ProductDetailPageView slug={slug} locale="zh" />;
+  return <ProductDetailPageView slug={slug} locale="en" />;
 }

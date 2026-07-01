@@ -1,13 +1,5 @@
-import { Hero } from "@/components/Hero";
-import { HomeIntro } from "@/components/HomeIntro";
-import { HomeProductsContact } from "@/components/HomeProductsContact";
+import { HomePage } from "@/components/HomePage";
 
-export default function HomePage() {
-  return (
-    <>
-      <Hero />
-      <HomeIntro />
-      <HomeProductsContact />
-    </>
-  );
+export default function Page() {
+  return <HomePage locale="zh" />;
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PageHero } from "@/components/PageHero";
+import { InfoPageView } from "@/components/InfoPageView";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -8,11 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AboutPage() {
-  return (
-    <PageHero
-      eyebrow="About"
-      title="关于邢台锦聪橡塑有限公司"
-      description="页面结构已预留，可继续补充企业介绍、发展历程、服务客户、工厂照片和资质信息。"
-    />
-  );
+  return <InfoPageView locale="zh" kind="about" />;
 }

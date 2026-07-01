@@ -8,7 +8,7 @@ export const site = {
   email: "lianhaoxuan@jincongrp.cn",
   location: "河北省邢台市",
   keywords: [
-    "注塑加工厂",
+    "注塑加工厂家",
     "塑料件定制",
     "来图来样加工",
     "小批量试产",
@@ -16,6 +16,7 @@ export const site = {
     "塑料平垫",
     "汽车塑料件",
     "电子电器塑料件",
+    "宠物用品塑料件",
     "家具塑料配件"
   ]
 };

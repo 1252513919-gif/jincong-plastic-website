@@ -6,3 +6,4 @@ dist
 *.log
 outputs
 work
+tsconfig.tsbuildinfo
