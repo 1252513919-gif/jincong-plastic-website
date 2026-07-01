@@ -1,5 +1,0 @@
-allowBuilds:
-  unrs-resolver: set this to true or false
-minimumReleaseAgeExclude:
-  - framer-motion@12.42.2
-  - motion-dom@12.42.2
