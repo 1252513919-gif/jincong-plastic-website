@@ -1,0 +1,57 @@
+[
+  {
+    "slug": "plastic-flat-washers-gaskets",
+    "name": "塑料平垫 / 垫片",
+    "englishName": "Plastic Flat Washers & Gaskets",
+    "category": "密封与间隔件",
+    "summary": "支持 PP、PE、PA、POM、ABS 等材料定制，适用于机械、电器、家具、汽配等连接与隔离场景。",
+    "materials": ["PP", "PE", "PA", "POM", "ABS"],
+    "capabilities": ["来图来样", "小批量试产", "多规格模具", "尺寸稳定"],
+    "applications": ["紧固防护", "绝缘隔离", "装配间隔", "防磨缓冲"],
+    "gradient": "from-cyan-300/25 via-slate-200/12 to-blue-500/25"
+  },
+  {
+    "slug": "automotive-plastic-parts",
+    "name": "汽车塑料件",
+    "englishName": "Automotive Plastic Parts",
+    "category": "汽车配套",
+    "summary": "面向汽车内外饰、连接件、防护件、卡扣件等注塑加工，可配合样件确认与工艺优化。",
+    "materials": ["ABS", "PP", "PA", "POM"],
+    "capabilities": ["OEM代工", "耐候材料", "批量稳定", "外观控制"],
+    "applications": ["内饰配件", "卡扣连接", "线束固定", "防护盖板"],
+    "gradient": "from-blue-400/25 via-zinc-200/10 to-sky-300/20"
+  },
+  {
+    "slug": "electronics-appliance-plastic-parts",
+    "name": "电子电器塑料件",
+    "englishName": "Electronics & Appliance Plastic Parts",
+    "category": "电子电器",
+    "summary": "用于电器外壳、绝缘件、支架、端盖等部件，重视外观质感、装配公差和材料适配。",
+    "materials": ["ABS", "PC", "PA", "PP"],
+    "capabilities": ["绝缘材料", "精密装配", "外观件加工", "结构优化"],
+    "applications": ["电器外壳", "支架底座", "绝缘隔板", "端盖连接"],
+    "gradient": "from-white/18 via-cyan-300/16 to-indigo-400/20"
+  },
+  {
+    "slug": "pet-supplies-plastic-parts",
+    "name": "宠物用品塑料件",
+    "englishName": "Pet Supplies Plastic Parts",
+    "category": "消费用品",
+    "summary": "可加工宠物用品配件、喂食器部件、玩具结构件等，支持颜色、结构、包装配合定制。",
+    "materials": ["PP", "PE", "ABS"],
+    "capabilities": ["颜色定制", "结构开发", "样品确认", "工厂直供"],
+    "applications": ["喂食器配件", "宠物笼配件", "玩具结构件", "清洁用品配件"],
+    "gradient": "from-teal-300/20 via-slate-100/12 to-blue-500/20"
+  },
+  {
+    "slug": "furniture-plastic-accessories",
+    "name": "家具塑料配件系列",
+    "englishName": "Furniture Plastic Accessories",
+    "category": "家具配件",
+    "summary": "适用于家具脚垫、封口盖、连接件、滑套等产品，支持多尺寸、多颜色、小批量和批量生产。",
+    "materials": ["PP", "PE", "PVC", "ABS"],
+    "capabilities": ["多色可选", "规格丰富", "快速打样", "长期供货"],
+    "applications": ["家具脚垫", "管塞端盖", "连接扣件", "防滑护套"],
+    "gradient": "from-slate-100/16 via-blue-300/16 to-cyan-400/22"
+  }
+]
