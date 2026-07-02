@@ -1,27 +1,27 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, BadgeCheck, CheckCircle2, Layers3 } from "lucide-react";
 import { PageHero } from "@/components/PageHero";
-import { content } from "@/i18n/site-content";
-import { localizedPath, type Locale } from "@/i18n/routing";
+import { useLanguage } from "@/i18n/LanguageContext";
+import { localizedPath } from "@/i18n/routing";
 import { getCatalogProductById } from "@/lib/product-catalog";
 import { getProductBySlug } from "@/lib/products";
 
 type ProductDetailPageViewProps = {
   slug: string;
-  locale: Locale;
 };
 
-export function ProductDetailPageView({ slug, locale }: ProductDetailPageViewProps) {
-  const copy = content[locale];
+export function ProductDetailPageView({ slug }: ProductDetailPageViewProps) {
+  const { language, copy } = useLanguage();
   const product = getCatalogProductById(slug);
 
   if (product) {
-    const title = locale === "zh" ? product.nameZh : product.nameEn;
-    const secondaryTitle = locale === "zh" ? product.nameEn : product.nameZh;
-    const category = locale === "zh" ? product.categoryZh : product.categoryEn;
-    const usage = locale === "zh" ? product.usageZh : product.usageEn;
+    const title = language === "zh" ? product.nameZh : product.nameEn;
+    const secondaryTitle = language === "zh" ? product.nameEn : product.nameZh;
+    const category = language === "zh" ? product.categoryZh : product.categoryEn;
+    const usage = language === "zh" ? product.usageZh : product.usageEn;
 
     return (
       <>
@@ -38,7 +38,7 @@ export function ProductDetailPageView({ slug, locale }: ProductDetailPageViewPro
         <section className="py-16 lg:py-24">
           <div className="section-shell grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
             <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-5 shadow-[0_24px_80px_rgba(15,23,42,0.08)]">
-              <div className="relative aspect-square w-full">
+              <div className="relative aspect-[4/3] w-full">
                 <Image
                   src={product.image}
                   alt={title}
@@ -51,9 +51,9 @@ export function ProductDetailPageView({ slug, locale }: ProductDetailPageViewPro
             </div>
 
             <div>
-              <Link href={localizedPath(locale, "/products")} className="inline-flex items-center gap-2 text-sm text-slate-600 transition hover:text-sky-700">
+              <Link href={localizedPath(language, "/products")} className="inline-flex items-center gap-2 text-sm text-slate-600 transition hover:text-sky-700">
                 <ArrowLeft className="h-4 w-4" />
-                {locale === "zh" ? "返回产品中心" : "Back to products"}
+                {language === "zh" ? "返回产品中心" : "Back to products"}
               </Link>
 
               <div className="mt-8 premium-card rounded-[2rem] p-6">
@@ -67,28 +67,23 @@ export function ProductDetailPageView({ slug, locale }: ProductDetailPageViewPro
                       {copy.productExplorer.customTag}
                     </span>
                   )}
-                  {product.needsReview && (
-                    <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs text-amber-700">
-                      {locale === "zh" ? "名称待确认" : "Name needs review"}
-                    </span>
-                  )}
                 </div>
 
                 <h1 className="mt-6 text-3xl font-semibold text-slate-950 sm:text-4xl">{title}</h1>
                 <p className="mt-2 text-sm uppercase tracking-[0.16em] text-slate-400">{secondaryTitle}</p>
 
                 <div className="mt-8 grid gap-5">
-                  <DetailBlock title={locale === "zh" ? "所属分类" : "Category"} items={[category]} />
-                  <DetailBlock title={locale === "zh" ? "可选材质" : "Materials"} items={product.material} />
-                  <DetailBlock title={locale === "zh" ? "主要用途" : "Usage"} items={[usage]} />
-                  <DetailBlock title={locale === "zh" ? "适用行业" : "Industries"} items={product.industries} />
+                  <DetailBlock title={language === "zh" ? "所属分类" : "Category"} items={[category]} />
+                  <DetailBlock title={language === "zh" ? "可选材料" : "Available Materials"} items={product.material} />
+                  <DetailBlock title={language === "zh" ? "主要用途" : "Application"} items={[usage]} />
+                  <DetailBlock title={language === "zh" ? "适用行业" : "Industries"} items={product.industries} />
                 </div>
 
                 <Link
-                  href={localizedPath(locale, "/contact")}
+                  href={localizedPath(language, "/contact")}
                   className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-sky-700 sm:w-auto"
                 >
-                  {locale === "zh" ? "咨询该产品报价" : "Request a Quote"}
+                  {language === "zh" ? "咨询该产品报价" : "Request a Quote"}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -101,7 +96,7 @@ export function ProductDetailPageView({ slug, locale }: ProductDetailPageViewPro
 
   const legacyProduct = getProductBySlug(slug);
   if (!legacyProduct) {
-    notFound();
+    return null;
   }
 
   return (
@@ -120,10 +115,10 @@ export function ProductDetailPageView({ slug, locale }: ProductDetailPageViewPro
           <div className="premium-card rounded-[2rem] p-8">
             <Layers3 className="h-8 w-8 text-sky-600" />
             <h2 className="mt-5 text-2xl font-semibold text-slate-950">
-              {locale === "zh" ? "该分类支持来图来样定制" : "This category supports custom manufacturing"}
+              {language === "zh" ? "该分类支持来图来样定制" : "This category supports custom manufacturing"}
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">{legacyProduct.summary}</p>
-            <Link href={localizedPath(locale, "/contact")} className="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-sky-700">
+            <Link href={localizedPath(language, "/contact")} className="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-sky-700">
               {copy.contact.submit}
               <ArrowRight className="h-4 w-4" />
             </Link>

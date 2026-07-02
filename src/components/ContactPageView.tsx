@@ -1,22 +1,19 @@
+"use client";
+
 import { Mail, MapPin, Phone, Smartphone } from "lucide-react";
 import { InquiryForm } from "@/components/InquiryForm";
 import { PageHero } from "@/components/PageHero";
-import { content } from "@/i18n/site-content";
-import type { Locale } from "@/i18n/routing";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { site } from "@/lib/site";
 
-type ContactPageViewProps = {
-  locale: Locale;
-};
-
-export function ContactPageView({ locale }: ContactPageViewProps) {
-  const copy = content[locale];
+export function ContactPageView() {
+  const { language, copy } = useLanguage();
   const page = copy.pages.contact;
   const cards = [
     { icon: Phone, label: copy.contact.phone, value: site.phone },
     { icon: Smartphone, label: copy.contact.wechat, value: site.wechat },
     { icon: Mail, label: copy.contact.email, value: site.email },
-    { icon: MapPin, label: locale === "zh" ? "所在地" : "Location", value: site.location }
+    { icon: MapPin, label: language === "zh" ? "所在地" : "Location", value: site.location }
   ];
 
   return (
@@ -37,7 +34,7 @@ export function ContactPageView({ locale }: ContactPageViewProps) {
               </div>
             ))}
           </aside>
-          <InquiryForm locale={locale} />
+          <InquiryForm />
         </div>
       </section>
     </>

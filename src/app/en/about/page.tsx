@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function EnglishAboutPage() {
-  return <InfoPageView locale="en" kind="about" />;
+  return <InfoPageView kind="about" />;
 }

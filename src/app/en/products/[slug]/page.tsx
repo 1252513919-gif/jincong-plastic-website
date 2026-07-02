@@ -37,5 +37,5 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
 
 export default async function EnglishProductDetailPage({ params }: ProductDetailPageProps) {
   const { slug } = await params;
-  return <ProductDetailPageView slug={slug} locale="en" />;
+  return <ProductDetailPageView slug={slug} />;
 }

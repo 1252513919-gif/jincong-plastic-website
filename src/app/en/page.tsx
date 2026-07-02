@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function EnglishHomePage() {
-  return <HomePage locale="en" />;
+  return <HomePage />;
 }

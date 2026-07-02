@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function EnglishFactoryCapabilityPage() {
-  return <InfoPageView locale="en" kind="factory" />;
+  return <InfoPageView kind="about" />;
 }

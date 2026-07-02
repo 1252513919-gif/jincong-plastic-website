@@ -2,9 +2,10 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { ArrowDown, ArrowRight, CheckCircle2, Factory, Layers3, Mail, Phone, Sparkles, Workflow } from "lucide-react";
-import { content } from "@/i18n/site-content";
-import { localizedPath, type Locale } from "@/i18n/routing";
+import { useLanguage } from "@/i18n/LanguageContext";
+import { localizedPath } from "@/i18n/routing";
 import { site } from "@/lib/site";
 import { Reveal } from "./Reveal";
 
@@ -12,88 +13,106 @@ const ManufacturingScene = dynamic(
   () => import("@/components/ManufacturingScene").then((module) => module.ManufacturingScene),
   {
     ssr: false,
-    loading: () => <div className="h-[420px] rounded-[2rem] bg-gradient-to-br from-white via-slate-50 to-sky-100" />
+    loading: () => <div className="h-72 rounded-[2rem] bg-gradient-to-br from-white via-slate-50 to-sky-100" />
   }
 );
 
-const icons = [Factory, Layers3, Sparkles, Workflow];
+const statIcons = [Factory, Layers3, Sparkles, Workflow];
 
-type HomePageProps = {
-  locale: Locale;
-};
+const keywordPositions = [
+  "left-4 top-[18%] md:left-[10%] md:top-[24%]",
+  "right-3 top-[20%] md:right-[11%] md:top-[25%]",
+  "left-6 bottom-[25%] md:left-[14%] md:bottom-[26%]",
+  "right-6 bottom-[24%] md:right-[14%] md:bottom-[27%]",
+  "left-1/2 top-[13%] -translate-x-1/2 md:top-[15%]",
+  "left-[8%] top-[50%] md:left-[20%]",
+  "right-[7%] top-[51%] md:right-[20%]"
+];
 
-export function HomePage({ locale }: HomePageProps) {
-  const copy = content[locale];
+export function HomePage() {
+  const { language, copy } = useLanguage();
 
   return (
     <>
-      <section className="relative flex min-h-screen overflow-hidden pt-24">
-        <div className="absolute inset-0 soft-grid opacity-80" />
-        <div className="absolute left-[-14rem] top-16 h-[34rem] w-[34rem] rounded-full bg-sky-200/45 blur-3xl" />
-        <div className="absolute right-[-10rem] top-24 h-[30rem] w-[30rem] rounded-full bg-orange-100/70 blur-3xl" />
-        <div className="absolute bottom-[-18rem] left-1/2 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-cyan-100/70 blur-3xl" />
+      <section className="relative flex min-h-screen items-center overflow-hidden pt-24">
+        <div className="absolute inset-0 soft-grid opacity-70" />
+        <div className="absolute left-[-14rem] top-12 h-[34rem] w-[34rem] rounded-full bg-sky-200/45 blur-3xl" />
+        <div className="absolute right-[-12rem] top-20 h-[32rem] w-[32rem] rounded-full bg-orange-100/70 blur-3xl" />
+        <div className="absolute bottom-[-18rem] left-1/2 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full bg-cyan-100/70 blur-3xl" />
 
-        <div className="section-shell relative z-10 grid flex-1 items-center gap-10 py-14 lg:grid-cols-[1.02fr_0.98fr] lg:py-20">
-          <Reveal>
-            <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white/75 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-sky-700 shadow-sm backdrop-blur">
+        {copy.hero.keywords.map((keyword, index) => (
+          <motion.span
+            key={keyword}
+            initial={{ opacity: 0, y: 18, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.35 + index * 0.08, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className={`absolute z-10 hidden rounded-full border border-slate-200/80 bg-white/75 px-4 py-2 text-xs font-semibold text-slate-600 shadow-sm backdrop-blur sm:inline-flex ${keywordPositions[index]}`}
+          >
+            {keyword}
+          </motion.span>
+        ))}
+
+        <div className="section-shell relative z-20 py-14 text-center lg:py-20">
+          <motion.div
+            initial={{ opacity: 0, y: 28, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+            className="mx-auto max-w-5xl"
+          >
+            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white/78 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-sky-700 shadow-sm backdrop-blur">
               <Sparkles className="h-4 w-4" />
               {copy.hero.eyebrow}
             </div>
-            <h1 className="mt-7 max-w-4xl text-5xl font-semibold tracking-normal text-slate-950 sm:text-6xl lg:text-7xl">
+            <h1 className="mx-auto mt-8 max-w-5xl font-['Microsoft_YaHei','PingFang_SC','Noto_Sans_SC',sans-serif] text-5xl font-semibold tracking-normal text-slate-950 sm:text-6xl lg:text-7xl">
               {copy.hero.title}
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">{copy.hero.description}</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <p className="mx-auto mt-5 max-w-3xl text-xl font-medium leading-8 text-slate-700 sm:text-2xl">
+              {copy.hero.subtitle}
+            </p>
+            <p className="mx-auto mt-5 max-w-3xl text-base leading-8 text-slate-600 sm:text-lg">{copy.hero.description}</p>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Link
-                href={localizedPath(locale, "/products")}
+                href={localizedPath(language, "/products")}
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_18px_50px_rgba(15,23,42,0.22)] transition hover:-translate-y-1 hover:bg-sky-700"
               >
                 {copy.actions.products}
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href={localizedPath(locale, "/contact")}
+                href={localizedPath(language, "/contact")}
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white/85 px-6 py-3.5 text-sm font-semibold text-slate-800 shadow-sm backdrop-blur transition hover:-translate-y-1 hover:border-sky-200 hover:bg-sky-50"
               >
                 {copy.actions.contact}
               </Link>
             </div>
-            <div className="mt-8 flex flex-wrap gap-2">
-              {copy.hero.badges.map((badge) => (
-                <span key={badge} className="rounded-full border border-slate-200 bg-white/80 px-3 py-2 text-xs font-medium text-slate-600 shadow-sm">
-                  {badge}
-                </span>
-              ))}
-            </div>
-          </Reveal>
+          </motion.div>
 
-          <Reveal delay={0.12} className="relative">
-            <div className="premium-card relative overflow-hidden rounded-[2.5rem] p-4 lg:p-6">
-              <div className="absolute inset-0 noise-overlay opacity-20" />
-              <div className="absolute right-6 top-6 rounded-full border border-white/70 bg-white/70 px-3 py-1 text-xs font-semibold text-slate-600 shadow-sm backdrop-blur">
-                WebGL Visual
-              </div>
-              <div className="relative hidden md:block">
+          <motion.div
+            initial={{ opacity: 0, y: 26 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.42, duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+            className="mx-auto mt-10 max-w-3xl"
+          >
+            <div className="premium-card relative overflow-hidden rounded-[2.25rem] p-4 md:p-5">
+              <div className="absolute inset-0 noise-overlay opacity-15" />
+              <div className="relative hidden h-64 md:block">
                 <ManufacturingScene />
               </div>
-              <div className="relative grid min-h-[360px] place-items-center md:hidden">
-                <div className="h-52 w-52 rounded-[3rem] bg-gradient-to-br from-white via-sky-100 to-slate-200 shadow-[0_28px_90px_rgba(14,165,233,0.25)]" />
-              </div>
-              <div className="relative grid gap-3 sm:grid-cols-3">
+              <div className="relative grid gap-3 md:grid-cols-3">
                 {copy.hero.visualLabels.map((label) => (
-                  <div key={label} className="rounded-2xl border border-slate-200/80 bg-white/82 p-4 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur">
+                  <div key={label} className="rounded-2xl border border-slate-200/80 bg-white/85 p-4 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur">
                     {label}
                   </div>
                 ))}
               </div>
             </div>
-          </Reveal>
+          </motion.div>
         </div>
 
         <a
           href="#home-intro"
-          aria-label={locale === "zh" ? "向下浏览" : "Scroll down"}
-          className="absolute bottom-6 left-1/2 z-20 grid h-12 w-12 -translate-x-1/2 animate-bounce place-items-center rounded-full border border-slate-200 bg-white/85 text-slate-700 shadow-lg backdrop-blur transition hover:bg-sky-50"
+          aria-label={language === "zh" ? "向下浏览" : "Scroll down"}
+          className="absolute bottom-6 left-1/2 z-30 grid h-12 w-12 -translate-x-1/2 animate-bounce place-items-center rounded-full border border-slate-200 bg-white/85 text-slate-700 shadow-lg backdrop-blur transition hover:bg-sky-50"
         >
           <ArrowDown className="h-5 w-5" />
         </a>
@@ -117,9 +136,14 @@ export function HomePage({ locale }: HomePageProps) {
             </div>
           </Reveal>
 
+          <Reveal className="mt-10 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+            <h3 className="text-2xl font-semibold text-slate-950">{copy.intro.customerTitle}</h3>
+            <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-600">{copy.intro.customerText}</p>
+          </Reveal>
+
           <div className="mt-12 grid gap-4 md:grid-cols-4">
             {copy.stats.map((stat, index) => {
-              const Icon = icons[index] ?? Sparkles;
+              const Icon = statIcons[index] ?? Sparkles;
               return (
                 <Reveal key={stat.label} delay={index * 0.04} className="premium-card rounded-[1.75rem] p-6 transition hover:-translate-y-1 hover:shadow-[0_28px_90px_rgba(14,165,233,0.12)]">
                   <Icon className="h-6 w-6 text-sky-600" />
@@ -137,7 +161,7 @@ export function HomePage({ locale }: HomePageProps) {
         <div className="section-shell">
           <Reveal>
             <div className="eyebrow">Product Series</div>
-            <h2 className="section-title">{locale === "zh" ? "围绕真实加工需求组织产品系列" : "Product series built around practical manufacturing needs"}</h2>
+            <h2 className="section-title">{language === "zh" ? "五大产品方向，按实际加工需求沟通定制" : "Five product directions for practical custom manufacturing"}</h2>
           </Reveal>
 
           <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -169,8 +193,8 @@ export function HomePage({ locale }: HomePageProps) {
           <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
             <Reveal>
               <div className="eyebrow">Capability / Process</div>
-              <h2 className="section-title">{locale === "zh" ? "材料、试产、代工和交付流程清楚可控" : "Clear capability and process from material to delivery"}</h2>
-              <p className="section-copy">{copy.about.body}</p>
+              <h2 className="section-title">{language === "zh" ? "材料、试产、代工和交付流程清楚可沟通" : "Clear discussion from material and trial runs to delivery"}</h2>
+              <p className="section-copy">{copy.pages.custom.description}</p>
             </Reveal>
             <div className="grid gap-4 sm:grid-cols-2">
               {copy.capabilities.map((item, index) => (
@@ -197,14 +221,14 @@ export function HomePage({ locale }: HomePageProps) {
         <div className="section-shell">
           <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
             <Reveal className="premium-card rounded-[2.25rem] p-7 lg:p-9">
-              <div className="eyebrow">Industries</div>
+              <div className="eyebrow">Applications</div>
               <h2 className="mt-4 text-3xl font-semibold text-slate-950 lg:text-4xl">
-                {locale === "zh" ? "覆盖多类常用塑料件应用场景" : "Multi-category plastic part applications"}
+                {language === "zh" ? "面向多行业常用塑料零部件需求" : "Plastic parts for multi-industry applications"}
               </h2>
               <div className="mt-6 flex flex-wrap gap-2">
-                {copy.industries.map((industry) => (
-                  <span key={industry} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">
-                    {industry}
+                {copy.series.slice(0, 5).map((item) => (
+                  <span key={item.title} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">
+                    {item.title}
                   </span>
                 ))}
               </div>
@@ -223,11 +247,11 @@ export function HomePage({ locale }: HomePageProps) {
                   <span className="flex items-center gap-3"><Mail className="h-4 w-4 text-sky-300" />{site.email}</span>
                 </div>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                  <Link href={localizedPath(locale, "/contact")} className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:-translate-y-1 hover:bg-sky-50">
+                  <Link href={localizedPath(language, "/contact")} className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:-translate-y-1 hover:bg-sky-50">
                     {copy.contact.submit}
                     <ArrowRight className="h-4 w-4" />
                   </Link>
-                  <Link href={localizedPath(locale, "/products")} className="inline-flex items-center justify-center rounded-full border border-white/20 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-white/10">
+                  <Link href={localizedPath(language, "/products")} className="inline-flex items-center justify-center rounded-full border border-white/20 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-white/10">
                     {copy.actions.products}
                   </Link>
                 </div>

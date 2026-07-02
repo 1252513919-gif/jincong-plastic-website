@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function ProductsPage() {
-  return <ProductsPageView locale="zh" />;
+  return <ProductsPageView />;
 }

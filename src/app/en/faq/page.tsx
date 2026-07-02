@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function EnglishFAQPage() {
-  return <InfoPageView locale="en" kind="faq" />;
+  return <InfoPageView kind="faq" />;
 }

@@ -2,62 +2,77 @@
 
 import { Send } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { content } from "@/i18n/site-content";
-import type { Locale } from "@/i18n/routing";
+import { useLanguage } from "@/i18n/LanguageContext";
 
-const materialOptions = ["PP", "PE", "ABS", "PA", "POM", "PC", "PVC"];
+type SubmitState = "idle" | "submitting" | "success" | "error";
 
-type InquiryFormProps = {
-  locale?: Locale;
-};
+export function InquiryForm() {
+  const { copy } = useLanguage();
+  const [state, setState] = useState<SubmitState>("idle");
 
-export function InquiryForm({ locale = "zh" }: InquiryFormProps) {
-  const [submitted, setSubmitted] = useState(false);
-  const copy = content[locale].inquiry;
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const payload = {
+      name: String(data.get("name") || ""),
+      company: String(data.get("company") || ""),
+      contact: String(data.get("contact") || ""),
+      email: String(data.get("email") || ""),
+      product: String(data.get("product") || ""),
+      category: String(data.get("category") || ""),
+      quantity: String(data.get("quantity") || ""),
+      material: String(data.get("material") || ""),
+      drawing: String(data.get("drawing") || ""),
+      message: String(data.get("message") || ""),
+      sourcePage: window.location.href
+    };
+
+    if (!payload.contact.trim() || !payload.product.trim()) {
+      setState("error");
+      return;
+    }
+
+    setState("submitting");
+    try {
+      const response = await fetch("/api/inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) throw new Error("request failed");
+      setState("success");
+      form.reset();
+    } catch {
+      setState("error");
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="premium-card rounded-[2rem] p-5 sm:p-7">
       <div className="grid gap-5 md:grid-cols-2">
+        <Field label={copy.inquiry.name} name="name" placeholder={copy.inquiry.placeholders.name} required />
+        <Field label={copy.inquiry.company} name="company" placeholder={copy.inquiry.placeholders.company} />
+        <Field label={copy.inquiry.contact} name="contact" placeholder={copy.inquiry.placeholders.contact} required />
+        <Field label={copy.inquiry.email} name="email" type="email" placeholder={copy.inquiry.placeholders.email} />
+        <Field label={copy.inquiry.product} name="product" placeholder={copy.inquiry.placeholders.product} required />
         <label className="grid gap-2 text-sm font-medium text-slate-600">
-          {copy.name}
-          <input className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-400" name="name" placeholder={copy.namePlaceholder} required />
-        </label>
-        <label className="grid gap-2 text-sm font-medium text-slate-600">
-          {copy.phone}
-          <input className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-400" name="phone" placeholder={copy.phonePlaceholder} required />
-        </label>
-        <label className="grid gap-2 text-sm font-medium text-slate-600">
-          {copy.email}
-          <input className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-400" name="email" type="email" placeholder="example@company.com" />
-        </label>
-        <label className="grid gap-2 text-sm font-medium text-slate-600">
-          {copy.product}
-          <input className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-400" name="product" placeholder={copy.productPlaceholder} required />
-        </label>
-        <label className="grid gap-2 text-sm font-medium text-slate-600">
-          {copy.material}
-          <select className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-sky-400" name="material" defaultValue="">
-            <option value="" disabled>{copy.materialPlaceholder}</option>
-            {[...materialOptions, copy.other].map((material) => (
-              <option key={material} value={material}>{material}</option>
+          {copy.inquiry.category}
+          <select className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-sky-400" name="category" defaultValue="">
+            <option value="">{copy.productExplorer.allSeries}</option>
+            {copy.series.map((item) => (
+              <option key={item.title} value={item.title}>{item.title}</option>
             ))}
           </select>
         </label>
-        <label className="grid gap-2 text-sm font-medium text-slate-600">
-          {copy.quantity}
-          <input className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-400" name="quantity" placeholder={copy.quantityPlaceholder} />
-        </label>
+        <Field label={copy.inquiry.quantity} name="quantity" placeholder={copy.inquiry.placeholders.quantity} />
+        <Field label={copy.inquiry.material} name="material" placeholder={copy.inquiry.placeholders.material} />
       </div>
 
       <fieldset className="mt-5">
-        <legend className="text-sm font-medium text-slate-600">{copy.drawing}</legend>
-        <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          {copy.drawingOptions.map((item) => (
+        <legend className="text-sm font-medium text-slate-600">{copy.inquiry.drawing}</legend>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {copy.inquiry.drawingOptions.map((item) => (
             <label key={item} className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
               <input type="radio" name="drawing" value={item} className="accent-sky-600" />
               {item}
@@ -67,20 +82,55 @@ export function InquiryForm({ locale = "zh" }: InquiryFormProps) {
       </fieldset>
 
       <label className="mt-5 grid gap-2 text-sm font-medium text-slate-600">
-        {copy.message}
-        <textarea className="min-h-36 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-400" name="message" placeholder={copy.messagePlaceholder} />
+        {copy.inquiry.message}
+        <textarea className="min-h-36 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-400" name="message" placeholder={copy.inquiry.placeholders.message} />
       </label>
 
-      <button className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-sky-700 sm:w-auto">
+      <button
+        disabled={state === "submitting"}
+        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+      >
         <Send className="h-4 w-4" />
-        {content[locale].contact.submit}
+        {state === "submitting" ? copy.inquiry.submitting : copy.inquiry.submit}
       </button>
 
-      {submitted && (
-        <p className="mt-4 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-700">
-          {copy.submitted}
+      {state === "success" && (
+        <p className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          {copy.inquiry.success}
+        </p>
+      )}
+      {state === "error" && (
+        <p className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          {copy.inquiry.error}
         </p>
       )}
     </form>
+  );
+}
+
+function Field({
+  label,
+  name,
+  placeholder,
+  type = "text",
+  required = false
+}: {
+  label: string;
+  name: string;
+  placeholder: string;
+  type?: string;
+  required?: boolean;
+}) {
+  return (
+    <label className="grid gap-2 text-sm font-medium text-slate-600">
+      {label}
+      <input
+        className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-400"
+        name={name}
+        type={type}
+        placeholder={placeholder}
+        required={required}
+      />
+    </label>
   );
 }

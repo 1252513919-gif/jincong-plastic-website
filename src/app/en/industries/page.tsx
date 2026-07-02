@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function EnglishIndustriesPage() {
-  return <InfoPageView locale="en" kind="industries" />;
+  return <InfoPageView kind="industries" />;
 }

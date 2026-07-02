@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function EnglishContactPage() {
-  return <ContactPageView locale="en" />;
+  return <ContactPageView />;
 }

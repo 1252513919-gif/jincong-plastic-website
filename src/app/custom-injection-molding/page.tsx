@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function CustomInjectionMoldingPage() {
-  return <InfoPageView locale="zh" kind="custom" />;
+  return <InfoPageView kind="custom" />;
 }
