@@ -3,11 +3,12 @@
 import { Send } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { site } from "@/lib/site";
 
-type SubmitState = "idle" | "submitting" | "success" | "error";
+type SubmitState = "idle" | "submitting" | "success" | "error" | "validation";
 
 export function InquiryForm() {
-  const { copy } = useLanguage();
+  const { language, copy } = useLanguage();
   const [state, setState] = useState<SubmitState>("idle");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -15,9 +16,11 @@ export function InquiryForm() {
     const form = event.currentTarget;
     const data = new FormData(form);
     const payload = {
+      language,
       name: String(data.get("name") || ""),
       company: String(data.get("company") || ""),
-      contact: String(data.get("contact") || ""),
+      phone: String(data.get("phone") || ""),
+      wechat: String(data.get("wechat") || ""),
       email: String(data.get("email") || ""),
       product: String(data.get("product") || ""),
       category: String(data.get("category") || ""),
@@ -28,8 +31,8 @@ export function InquiryForm() {
       sourcePage: window.location.href
     };
 
-    if (!payload.contact.trim() || !payload.product.trim()) {
-      setState("error");
+    if ((!payload.phone.trim() && !payload.wechat.trim()) || !payload.message.trim()) {
+      setState("validation");
       return;
     }
 
@@ -51,11 +54,12 @@ export function InquiryForm() {
   return (
     <form onSubmit={handleSubmit} className="premium-card rounded-[2rem] p-5 sm:p-7">
       <div className="grid gap-5 md:grid-cols-2">
-        <Field label={copy.inquiry.name} name="name" placeholder={copy.inquiry.placeholders.name} required />
+        <Field label={copy.inquiry.name} name="name" placeholder={copy.inquiry.placeholders.name} />
         <Field label={copy.inquiry.company} name="company" placeholder={copy.inquiry.placeholders.company} />
-        <Field label={copy.inquiry.contact} name="contact" placeholder={copy.inquiry.placeholders.contact} required />
+        <Field label={copy.inquiry.phone} name="phone" placeholder={copy.inquiry.placeholders.phone} />
+        <Field label={copy.inquiry.wechat} name="wechat" placeholder={copy.inquiry.placeholders.wechat} />
         <Field label={copy.inquiry.email} name="email" type="email" placeholder={copy.inquiry.placeholders.email} />
-        <Field label={copy.inquiry.product} name="product" placeholder={copy.inquiry.placeholders.product} required />
+        <Field label={copy.inquiry.product} name="product" placeholder={copy.inquiry.placeholders.product} />
         <label className="grid gap-2 text-sm font-medium text-slate-600">
           {copy.inquiry.category}
           <select className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition focus:border-sky-400" name="category" defaultValue="">
@@ -72,7 +76,7 @@ export function InquiryForm() {
       <fieldset className="mt-5">
         <legend className="text-sm font-medium text-slate-600">{copy.inquiry.drawing}</legend>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {copy.inquiry.drawingOptions.map((item) => (
+          {copy.inquiry.drawingOptions.map((item: string) => (
             <label key={item} className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
               <input type="radio" name="drawing" value={item} className="accent-sky-600" />
               {item}
@@ -83,7 +87,12 @@ export function InquiryForm() {
 
       <label className="mt-5 grid gap-2 text-sm font-medium text-slate-600">
         {copy.inquiry.message}
-        <textarea className="min-h-36 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-400" name="message" placeholder={copy.inquiry.placeholders.message} />
+        <textarea
+          className="min-h-36 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-sky-400"
+          name="message"
+          placeholder={copy.inquiry.placeholders.message}
+          required
+        />
       </label>
 
       <button
@@ -95,14 +104,25 @@ export function InquiryForm() {
       </button>
 
       {state === "success" && (
-        <p className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-          {copy.inquiry.success}
+        <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          <p className="font-semibold">{copy.inquiry.success}</p>
+          <p className="mt-1 leading-6">{copy.inquiry.successDetail}</p>
+        </div>
+      )}
+      {state === "validation" && (
+        <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          {copy.inquiry.validation}
         </p>
       )}
       {state === "error" && (
-        <p className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-          {copy.inquiry.error}
-        </p>
+        <div className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <p className="font-semibold">{copy.inquiry.error}</p>
+          <p className="mt-1 leading-6">
+            {copy.contact.phone}: {site.phone}<br />
+            {copy.contact.wechat}: {site.wechat}<br />
+            {copy.contact.email}: {site.email}
+          </p>
+        </div>
       )}
     </form>
   );
@@ -112,14 +132,12 @@ function Field({
   label,
   name,
   placeholder,
-  type = "text",
-  required = false
+  type = "text"
 }: {
   label: string;
   name: string;
   placeholder: string;
   type?: string;
-  required?: boolean;
 }) {
   return (
     <label className="grid gap-2 text-sm font-medium text-slate-600">
@@ -129,7 +147,6 @@ function Field({
         name={name}
         type={type}
         placeholder={placeholder}
-        required={required}
       />
     </label>
   );

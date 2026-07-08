@@ -8,11 +8,15 @@ export type CatalogProduct = {
   category: string;
   categoryZh: string;
   categoryEn: string;
+  subCategoryZh?: string;
+  subCategoryEn?: string;
   image: string;
   material: string[];
   usageZh: string;
   usageEn: string;
   industries: string[];
+  industriesZh?: string[];
+  industriesEn?: string[];
   customizable: boolean;
   needsReview: boolean;
 };
@@ -24,6 +28,8 @@ export type CatalogCategory = {
   usageZh: string;
   usageEn: string;
   industries: string[];
+  industriesZh?: string[];
+  industriesEn?: string[];
 };
 
 export const catalogProducts = products as CatalogProduct[];

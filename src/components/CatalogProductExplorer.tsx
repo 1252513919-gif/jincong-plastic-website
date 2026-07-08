@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ArrowRight, BadgeCheck, Search, SlidersHorizontal } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { localizedPath } from "@/i18n/routing";
+import { localizedPath, type Locale } from "@/i18n/routing";
 import type { CatalogProduct } from "@/lib/product-catalog";
 
 type CatalogProductExplorerProps = {
@@ -15,19 +15,25 @@ type CatalogProductExplorerProps = {
 const allValue = "all";
 
 const categoryFallback: Record<string, { zh: string; en: string }> = {
-  "pet-plastic-products": { zh: "宠物用品系列", en: "Pet Plastic Products" },
-  "electronic-electrical-plastic-parts": { zh: "电子电气塑料件系列", en: "Electronic & Electrical Plastic Parts" },
-  "furniture-plastic-fittings": { zh: "家具塑料配件系列", en: "Furniture Plastic Fittings" },
-  "plastic-washers": { zh: "平垫系列", en: "Plastic Washers / Gaskets" },
+  "pet-plastic-products": { zh: "宠物用品系列", en: "Pet Product Parts" },
+  "electronic-electrical-plastic-parts": { zh: "电子电气塑料件系列", en: "Electrical & Electronic Plastic Parts" },
+  "furniture-plastic-fittings": { zh: "家具塑料配件系列", en: "Furniture Plastic Accessories" },
+  "plastic-washers": { zh: "平垫系列", en: "Flat Washers" },
   "automotive-plastic-parts": { zh: "汽车塑料件系列", en: "Automotive Plastic Parts" }
 };
 
-function getSubCategory(product: CatalogProduct) {
+function getSubCategoryKey(product: CatalogProduct) {
+  if (product.subCategoryZh) return product.subCategoryZh;
   const parts = product.image.split("/").filter(Boolean);
   return parts.length >= 4 ? parts[3] : "";
 }
 
-function getSeriesLabel(slug: string, language: "zh" | "en", product?: CatalogProduct) {
+function getSubCategoryLabel(product: CatalogProduct, language: Locale) {
+  if (language === "zh") return product.subCategoryZh || getSubCategoryKey(product);
+  return product.subCategoryEn || product.subCategoryZh || getSubCategoryKey(product);
+}
+
+function getSeriesLabel(slug: string, language: Locale, product?: CatalogProduct) {
   const fallback = categoryFallback[slug];
   if (fallback) return language === "zh" ? fallback.zh : fallback.en;
   if (!product) return slug;
@@ -52,21 +58,29 @@ export function CatalogProductExplorer({ products }: CatalogProductExplorerProps
 
   const subCategories = useMemo(() => {
     const scoped = series === allValue ? products : products.filter((product) => product.category === series);
-    return Array.from(new Set(scoped.map(getSubCategory).filter(Boolean))).sort((a, b) => a.localeCompare(b, "zh-Hans-CN"));
-  }, [products, series]);
+    const byKey = new Map<string, string>();
+    scoped.forEach((product) => {
+      const key = getSubCategoryKey(product);
+      if (key) byKey.set(key, getSubCategoryLabel(product, language));
+    });
+    return Array.from(byKey.entries())
+      .map(([value, label]) => ({ value, label }))
+      .sort((a, b) => a.label.localeCompare(b.label, language === "zh" ? "zh-Hans-CN" : "en"));
+  }, [language, products, series]);
 
   const filteredProducts = useMemo(() => {
     const keyword = query.trim().toLowerCase();
     return products.filter((product) => {
-      const productSubCategory = getSubCategory(product);
+      const productSubCategory = getSubCategoryKey(product);
+      const subLabel = getSubCategoryLabel(product, language);
       const matchesSeries = series === allValue || product.category === series;
       const matchesSubCategory = subCategory === allValue || productSubCategory === subCategory;
       const matchesQuery =
         keyword.length === 0 ||
-        `${product.nameZh} ${product.nameEn} ${product.categoryZh} ${product.categoryEn} ${productSubCategory}`.toLowerCase().includes(keyword);
+        `${product.nameZh} ${product.nameEn} ${product.categoryZh} ${product.categoryEn} ${productSubCategory} ${subLabel}`.toLowerCase().includes(keyword);
       return matchesSeries && matchesSubCategory && matchesQuery;
     });
-  }, [products, query, series, subCategory]);
+  }, [language, products, query, series, subCategory]);
 
   return (
     <div>
@@ -110,8 +124,8 @@ export function CatalogProductExplorer({ products }: CatalogProductExplorerProps
             >
               <option value={allValue}>{copy.productExplorer.allSubcategories}</option>
               {subCategories.map((item) => (
-                <option key={item} value={item}>
-                  {item}
+                <option key={item.value} value={item.value}>
+                  {item.label}
                 </option>
               ))}
             </select>
@@ -161,21 +175,23 @@ export function CatalogProductExplorer({ products }: CatalogProductExplorerProps
       <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {filteredProducts.map((product) => {
           const title = language === "zh" ? product.nameZh : product.nameEn;
-          const sub = getSubCategory(product);
+          const subLabel = getSubCategoryLabel(product, language);
+          const supportText = language === "zh" ? product.usageZh : product.usageEn;
           return (
             <Link
               key={product.id}
               href={localizedPath(language, `/products/${encodeURIComponent(product.id)}`)}
               className="group overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_20px_70px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-2 hover:border-sky-200 hover:shadow-[0_28px_90px_rgba(15,23,42,0.1)]"
             >
-              <div className="aspect-[4/3] w-full overflow-hidden bg-gradient-to-br from-slate-50 to-white p-3">
+              <div className="aspect-[4/3] w-full overflow-hidden bg-gradient-to-br from-slate-50 to-white p-4">
                 <div className="relative h-full w-full">
                   <Image
                     src={product.image}
                     alt={title}
                     fill
+                    loading="lazy"
                     sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                    className="object-contain object-center transition duration-500 group-hover:scale-[1.035]"
+                    className="object-contain object-center transition duration-500 group-hover:scale-[1.025]"
                   />
                 </div>
               </div>
@@ -185,9 +201,9 @@ export function CatalogProductExplorer({ products }: CatalogProductExplorerProps
                   <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-600">
                     {getSeriesLabel(product.category, language, product)}
                   </span>
-                  {sub && (
+                  {subLabel && (
                     <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-500">
-                      {sub}
+                      {subLabel}
                     </span>
                   )}
                   {product.customizable && (
@@ -198,7 +214,9 @@ export function CatalogProductExplorer({ products }: CatalogProductExplorerProps
                   )}
                 </div>
                 <h2 className="text-xl font-semibold text-slate-950">{title}</h2>
-                <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-400">{language === "zh" ? product.nameEn : product.nameZh}</p>
+                <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-400">
+                  {getSeriesLabel(product.category, language, product)}
+                </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {product.material.slice(0, 4).map((item) => (
                     <span key={item} className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-600">
@@ -206,7 +224,7 @@ export function CatalogProductExplorer({ products }: CatalogProductExplorerProps
                     </span>
                   ))}
                 </div>
-                <p className="mt-4 line-clamp-2 text-sm leading-7 text-slate-600">{language === "zh" ? product.usageZh : product.usageEn}</p>
+                <p className="mt-4 line-clamp-2 text-sm leading-7 text-slate-600">{supportText}</p>
                 <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-950">
                   {copy.actions.details}
                   <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />

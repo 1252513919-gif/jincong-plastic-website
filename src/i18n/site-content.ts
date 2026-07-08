@@ -1,6 +1,26 @@
 import { site } from "@/lib/site";
 import type { Locale } from "./routing";
 
+const processZh = [
+  "需求沟通",
+  "图纸 / 样品确认",
+  "材料与工艺确认",
+  "报价",
+  "打样 / 小批量试产",
+  "批量生产",
+  "包装发货"
+];
+
+const processEn = [
+  "Requirement Discussion",
+  "Drawing / Sample Confirmation",
+  "Material & Process Confirmation",
+  "Quotation",
+  "Sampling / Trial Production",
+  "Batch Production",
+  "Packaging & Delivery"
+];
+
 export const content = {
   zh: {
     lang: "中文",
@@ -25,48 +45,83 @@ export const content = {
     hero: {
       eyebrow: "Plastic Injection Molding / OEM / ODM",
       title: site.name,
-      subtitle: "注塑加工与塑料件定制，从样品到批量生产",
-      description:
-        "支持来图来样加工、小批量试产、OEM/ODM 定制和工厂直连沟通，适合有图纸、样品、产品图片或长期供货需求的客户。",
-      keywords: ["注塑加工", "塑料件定制", "来图来样加工", "小批量试产", "OEM/ODM", "工厂直供", "多行业塑料件定制"],
-      visualLabels: ["样品沟通", "材料确认", "试产交付"]
+      subtitle: "注塑加工与塑料件定制，从样品确认到批量生产",
+      descriptionLines: [
+        "来图来样加工｜小批量试产｜OEM/ODM定制｜工厂直连沟通",
+        "适合有图纸、样品、产品图片或长期供货需求的客户"
+      ],
+      keywords: ["工厂直供", "来图来样加工", "小批量试产", "多行业塑料件定制"],
+      visualLabels: ["样品确认", "材料选择", "试产交付"]
     },
     stats: [
-      { value: "100+", label: "产品类型", note: "产品图片仅为部分加工示例" },
+      { value: "100+", label: "产品类型", note: "网站图片展示部分塑料件加工示例" },
       { value: "来图来样", label: "支持加工", note: "图纸、样品、图片、尺寸均可先沟通" },
       { value: "小批量", label: "支持试产", note: "适合新品验证和前期采购测试" },
-      { value: "OEM/ODM", label: "定制配合", note: "材料、尺寸、结构、颜色可沟通" }
+      { value: "OEM/ODM", label: "定制配合", note: "材料、尺寸、结构、颜色可沟通确认" }
     ],
     intro: {
       eyebrow: "Factory Positioning",
       title: "我们是一家专注塑料件加工与注塑定制的工厂",
       body:
-        "邢台锦聪橡塑有限公司面向有图纸、样品、产品图片或定制需求的客户，提供来图来样加工、小批量试产和批量供货服务。我们目前重点覆盖宠物用品塑料件、电子电气塑料件、家具塑料配件、平垫系列、汽车塑料件等产品方向，适合需要灵活沟通和中小批量配合的项目。",
+        "邢台锦聪橡塑有限公司面向有图纸、样品、产品图片或定制需求的客户，提供来图来样加工、小批量试产和批量供货服务。我们重点覆盖宠物用品塑料件、电子电气塑料件、家具塑料配件、平垫系列和汽车塑料件等产品方向，适合需要灵活沟通和中小批量配合的项目。",
       customerTitle: "适合这些客户",
       customerText: "有样品、图纸、产品图片、定制需求、小批量试产需求或长期批量采购需求的客户。",
       points: ["工厂直连沟通", "支持来图来样加工", "支持小批量试产", "按材料、尺寸和用途定制"]
     },
     series: [
-      { title: "宠物用品系列", text: "宠物推车配件、宠物箱配件、牵引用品塑料件、饮水喂食器配件等。", slug: "pet-plastic-products" },
-      { title: "电子电气塑料件系列", text: "电源开关配件、接线盒、电池盒、线夹、端盖、保护盖、塑料固定座等。", slug: "electronic-electrical-plastic-parts" },
-      { title: "家具塑料配件系列", text: "脚垫、堵头、连接件、调节脚、保护套、塑料垫片和装饰盖。", slug: "furniture-plastic-fittings" },
-      { title: "平垫 / 垫片系列", text: "标准圆形平垫、尼龙平垫、绝缘垫片、密封垫片、非标垫圈等。", slug: "plastic-washers" },
-      { title: "汽车塑料件系列", text: "汽车卡扣、堵盖、垫片、支架、内饰塑料件、外饰塑料件、电气塑料件。", slug: "automotive-plastic-parts" },
-      { title: "通用塑料件定制", text: "按图纸、样品、产品图片、装配要求或使用场景定制加工。", slug: "custom" }
+      {
+        title: "宠物用品系列",
+        text: "可定制宠物推车塑料配件、宠物箱配件、牵引用品塑料件、宠物用品结构件，支持按样品、图纸或产品图片加工。",
+        slug: "pet-plastic-products",
+        tags: ["宠物箱配件", "牵引用品", "喂养配件"]
+      },
+      {
+        title: "电子电气塑料件系列",
+        text: "可加工接线盒、电池盒、保护盖、线夹、端盖、塑料固定座等电子电气类塑料零部件。",
+        slug: "electronic-electrical-plastic-parts",
+        tags: ["接线盒", "保护盖", "仪器壳体"]
+      },
+      {
+        title: "家具塑料配件系列",
+        text: "可定制家具脚垫、堵头、调节脚、连接件、保护套、塑料垫片等家具配套零件。",
+        slug: "furniture-plastic-fittings",
+        tags: ["脚垫", "堵头", "装饰盖"]
+      },
+      {
+        title: "平垫系列",
+        text: "提供尼龙、PP、PE、POM、PVC、PC 等材质平垫、绝缘垫片、透明垫片及非标垫片定制。",
+        slug: "plastic-washers",
+        tags: ["尼龙平垫", "绝缘垫片", "非标垫圈"]
+      },
+      {
+        title: "汽车塑料件系列",
+        text: "可加工汽车卡扣、堵盖、支架、内饰塑料件、外饰塑料件、电气保护件等汽车相关塑料零部件。",
+        slug: "automotive-plastic-parts",
+        tags: ["汽车卡扣", "堵盖", "支架"]
+      }
     ],
     capabilities: [
       "ABS / PP / PE / PC / POM / PVC / 尼龙等材料可沟通",
       "支持产品图片、实物样品、2D 图纸、3D 文件沟通",
       "支持小批量试产和批量供货",
-      "支持 OEM/ODM 定制和长期配套",
+      "支持 OEM/ODM 定制和长期配合",
       "尺寸、颜色、结构和包装要求可沟通",
       "工厂直连，适合中小批量定制项目"
     ],
-    process: ["需求沟通", "图纸 / 样品确认", "材料与工艺确认", "报价", "打样 / 小批量试产", "批量生产", "包装交付"],
+    process: processZh,
+    processDetails: [
+      "客户提供产品图片、样品、图纸、尺寸、材料、数量和使用场景。",
+      "根据结构、尺寸、材料、精度和使用环境判断加工方式。",
+      "确认可加工性、材料选择、颜色、数量区间、交期和质量要求。",
+      "根据产品结构、材料、数量、加工难度和包装要求进行报价。",
+      "根据需求进行小批量试样或样品确认。",
+      "样品确认后进入批量加工和质量检查。",
+      "根据客户要求进行包装、发货和后续沟通。"
+    ],
     contact: {
       title: "把图纸、样品或产品图片发给我们",
       body: "请尽量提供产品用途、尺寸、材料、数量、颜色和是否已有图纸或样品，便于更快判断加工方案和报价。",
-      phone: "手机",
+      phone: "电话",
       wechat: "微信",
       email: "邮箱",
       submit: "提交定制需求"
@@ -88,7 +143,7 @@ export const content = {
         eyebrow: "Industries",
         title: "应用行业",
         description:
-          "我们的塑料件加工服务可应用于宠物用品、电子电气、家具配件、汽车零部件、仪器仪表及其他定制塑料结构件。不同场景对材料性能、尺寸稳定性、耐磨性、耐候性和装配结构有不同要求，可根据样品、图纸和使用环境沟通加工。"
+          "我们的塑料件加工服务可应用于多个行业，包括宠物用品、电子电气、家具配件、汽车零部件、仪器仪表及其他定制塑料结构件。不同应用场景对材料性能、尺寸稳定性、耐磨性、耐候性和装配结构有不同要求，我们可根据客户提供的样品、图纸和使用环境进行沟通加工。"
       },
       about: {
         eyebrow: "About Jincong",
@@ -121,18 +176,20 @@ export const content = {
     inquiry: {
       name: "姓名",
       company: "公司名称",
-      contact: "手机 / WhatsApp / 微信",
+      phone: "电话",
+      wechat: "微信",
       email: "邮箱",
       product: "产品需求",
-      category: "产品类别",
+      category: "产品类型",
       quantity: "预计数量",
       material: "材料要求",
-      drawing: "是否有图纸或样品",
-      message: "留言内容",
+      drawing: "是否有图纸/样品",
+      message: "需求描述",
       placeholders: {
         name: "请输入姓名",
-        company: "可选",
-        contact: "便于我们快速联系",
+        company: "选填",
+        phone: "电话或手机号",
+        wechat: "微信号，至少与电话填写一项",
         email: "example@company.com",
         product: "如：塑料垫片、汽车卡扣、电子外壳",
         quantity: "如：100件试产 / 3000件/月",
@@ -141,9 +198,11 @@ export const content = {
       },
       drawingOptions: ["有图纸", "有样品", "有产品图片", "暂时没有"],
       submit: "提交询盘",
-      submitting: "提交中...",
-      success: "询盘已提交，我们会尽快联系您。",
-      error: "提交失败，请稍后重试，或直接通过手机/微信联系我们。"
+      submitting: "正在提交...",
+      success: "提交成功，我们已收到您的定制需求。",
+      successDetail: "我们会根据您提供的产品用途、材料、数量和图纸/样品情况，尽快与您联系确认加工方案。",
+      error: "提交暂时未成功，您可以直接通过以下方式联系我们：",
+      validation: "请至少填写电话或微信，并填写需求描述。"
     },
     footer: {
       summary: "注塑加工、塑料件定制、来图来样加工、小批量试产、OEM/ODM 和工厂直连沟通。"
@@ -172,10 +231,12 @@ export const content = {
     hero: {
       eyebrow: "Plastic Injection Molding / OEM / ODM",
       title: site.englishName,
-      subtitle: "Injection Molding & Custom Plastic Parts, from Samples to Batch Production",
-      description:
-        "We support drawing/sample based manufacturing, small-batch trial runs, OEM/ODM customization and direct factory communication for customers with drawings, samples, product photos or long-term supply needs.",
-      keywords: ["Injection Molding", "Custom Plastic Parts", "By Drawing / Sample", "Small Batch Trial", "OEM/ODM", "Factory Direct", "Multi-industry Parts"],
+      subtitle: "Injection molding and custom plastic parts, from sample confirmation to batch production.",
+      descriptionLines: [
+        "Drawing-based production | Sample-based customization | Small-batch trial production | OEM/ODM",
+        "Suitable for customers with drawings, samples, product photos, or long-term supply needs."
+      ],
+      keywords: ["Factory Direct", "Drawing & Sample Customization", "Small-Batch Trial Production", "Multi-Industry Plastic Parts"],
       visualLabels: ["Sample Review", "Material Check", "Trial Delivery"]
     },
     stats: [
@@ -186,20 +247,44 @@ export const content = {
     ],
     intro: {
       eyebrow: "Factory Positioning",
-      title: "A practical factory for plastic parts manufacturing and injection molding",
+      title: "A factory focused on plastic parts manufacturing and injection molding",
       body:
-        "Xingtai Jincong Rubber & Plastic Co., Ltd. works with customers who have drawings, samples, product photos or custom plastic part requirements. We support drawing/sample based manufacturing, small-batch trial production and batch supply, with product coverage across pet products, electronic and electrical parts, furniture fittings, washers and automotive plastic parts.",
+        "Xingtai Jincong Rubber & Plastic Co., Ltd. works with customers who have drawings, samples, product photos or custom plastic part requirements. We support drawing/sample based manufacturing, small-batch trial production and batch supply, with product coverage across pet product parts, electrical and electronic parts, furniture fittings, flat washers and automotive plastic parts.",
       customerTitle: "Who We Fit",
       customerText: "Customers with samples, drawings, product photos, custom needs, small-batch trial requirements or long-term batch purchasing plans.",
       points: ["Direct factory communication", "Drawing/sample based manufacturing", "Small-batch trial production", "Customized by material, size and application"]
     },
     series: [
-      { title: "Pet Plastic Products", text: "Pet stroller parts, carrier parts, leash housings, feeding and watering accessories.", slug: "pet-plastic-products" },
-      { title: "Electronic & Electrical Plastic Parts", text: "Power switch fittings, junction boxes, battery boxes, clips, end caps, covers and fixing bases.", slug: "electronic-electrical-plastic-parts" },
-      { title: "Furniture Plastic Fittings", text: "Glides, plugs, connectors, adjustable feet, protective caps, washers and decorative covers.", slug: "furniture-plastic-fittings" },
-      { title: "Plastic Washers / Gaskets", text: "Round washers, nylon washers, insulation gaskets, sealing washers and custom rings.", slug: "plastic-washers" },
-      { title: "Automotive Plastic Parts", text: "Automotive clips, plugs, washers, brackets, interior parts, exterior parts and electrical plastic parts.", slug: "automotive-plastic-parts" },
-      { title: "General Custom Plastic Parts", text: "Custom manufacturing by drawings, samples, product photos, assembly needs or application scenarios.", slug: "custom" }
+      {
+        title: "Pet Product Parts",
+        text: "Custom pet stroller parts, carrier parts, leash housings and structural pet product parts based on samples, drawings or product photos.",
+        slug: "pet-plastic-products",
+        tags: ["Carrier Parts", "Leash Parts", "Feeding Parts"]
+      },
+      {
+        title: "Electrical & Electronic Plastic Parts",
+        text: "Junction boxes, battery boxes, protective covers, wire clips, end caps and plastic fixing bases for electrical applications.",
+        slug: "electronic-electrical-plastic-parts",
+        tags: ["Junction Boxes", "Covers", "Instrument Housings"]
+      },
+      {
+        title: "Furniture Plastic Accessories",
+        text: "Furniture glides, tube plugs, adjustable feet, connectors, protective caps, washers and matching plastic fittings.",
+        slug: "furniture-plastic-fittings",
+        tags: ["Glides", "Tube Plugs", "Caps"]
+      },
+      {
+        title: "Flat Washers",
+        text: "Nylon, PP, PE, POM, PVC and PC washers, insulation washers, transparent washers and custom non-standard gaskets.",
+        slug: "plastic-washers",
+        tags: ["Nylon Washers", "Insulation Washers", "Custom Gaskets"]
+      },
+      {
+        title: "Automotive Plastic Parts",
+        text: "Automotive clips, plugs, brackets, interior plastic parts, exterior plastic parts and electrical protective components.",
+        slug: "automotive-plastic-parts",
+        tags: ["Auto Clips", "Caps", "Brackets"]
+      }
     ],
     capabilities: [
       "ABS / PP / PE / PC / POM / PVC / Nylon and other materials can be discussed",
@@ -209,7 +294,16 @@ export const content = {
       "Dimensions, colors, structure and packaging can be discussed",
       "Direct factory communication for small and medium batch projects"
     ],
-    process: ["Requirement Review", "Drawing / Sample Check", "Material & Process", "Quotation", "Trial Run", "Batch Production", "Packing & Delivery"],
+    process: processEn,
+    processDetails: [
+      "Customers provide product photos, samples, drawings, dimensions, materials, quantity and application scenario.",
+      "We review structure, size, material, accuracy requirements and use environment to judge the processing method.",
+      "Manufacturability, material choice, color, quantity range, lead time and quality requirements are confirmed.",
+      "Quotation is based on part structure, material, quantity, processing difficulty and packaging requirements.",
+      "Small-batch samples or trial production are arranged when needed.",
+      "Batch processing and quality checks start after sample confirmation.",
+      "Packaging, delivery and follow-up communication are arranged according to customer requirements."
+    ],
     contact: {
       title: "Send us drawings, samples or product photos",
       body: "Please include application, dimensions, material, quantity, color and whether drawings or samples are available, so we can review the manufacturing approach and quotation faster.",
@@ -235,7 +329,7 @@ export const content = {
         eyebrow: "Industries",
         title: "Industries",
         description:
-          "Our plastic parts manufacturing service can be used in pet products, electronics, furniture fittings, automotive components, instruments and other custom plastic structures. Material performance, dimensional stability, wear resistance, weather resistance and assembly details vary by application."
+          "Our plastic parts manufacturing service can be used in pet products, electrical and electronic parts, furniture fittings, automotive components, instruments and other custom plastic structures. Material performance, dimensional stability, wear resistance, weather resistance and assembly details vary by application."
       },
       about: {
         eyebrow: "About Jincong",
@@ -268,18 +362,20 @@ export const content = {
     inquiry: {
       name: "Name",
       company: "Company",
-      contact: "Phone / WhatsApp / WeChat",
+      phone: "Phone",
+      wechat: "WeChat",
       email: "Email",
       product: "Product Requirement",
-      category: "Product Category",
+      category: "Product Type",
       quantity: "Estimated Quantity",
       material: "Material Requirement",
       drawing: "Drawing or Sample Available",
-      message: "Message",
+      message: "Requirement Details",
       placeholders: {
         name: "Your name",
         company: "Optional",
-        contact: "How we can reach you quickly",
+        phone: "Phone or mobile number",
+        wechat: "WeChat ID, required if phone is empty",
         email: "example@company.com",
         product: "e.g. plastic washer, automotive clip, electronic housing",
         quantity: "e.g. 100 pcs trial / 3000 pcs per month",
@@ -289,8 +385,10 @@ export const content = {
       drawingOptions: ["Drawing available", "Sample available", "Product photos available", "Not yet"],
       submit: "Submit Inquiry",
       submitting: "Submitting...",
-      success: "Inquiry submitted. We will contact you soon.",
-      error: "Submission failed. Please try again later or contact us by phone/WeChat."
+      success: "Submitted successfully. We have received your requirement.",
+      successDetail: "We will review your product use, material, quantity, drawing or sample information, and contact you as soon as possible to confirm the processing solution.",
+      error: "Submission was not completed. You can contact us directly:",
+      validation: "Please fill in at least phone or WeChat, and describe your requirement."
     },
     footer: {
       summary: "Injection molding, custom plastic parts, drawing/sample manufacturing, small-batch trial production, OEM/ODM and direct factory communication."

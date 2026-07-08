@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { InfoPageView } from "@/components/InfoPageView";
 
 export const metadata: Metadata = {
-  title: "应用行业 | 汽配 电子电器 家具 宠物用品",
-  description: "注塑加工产品应用于汽车配套、电子电器、家具配件、宠物用品、仪器仪表和工业设备等行业。"
+  title: "应用行业 | 汽车 电子电气 家具 宠物用品",
+  description: "注塑加工产品可应用于汽车配件、电子电气、家具配件、宠物用品、仪器仪表和其他定制塑料结构件。"
 };
 
 export default function IndustriesPage() {

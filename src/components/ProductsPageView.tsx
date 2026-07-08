@@ -27,8 +27,9 @@ export function ProductsPageView() {
         <div className="section-shell">
           <Reveal className="grid gap-5 rounded-[2rem] border border-slate-200 bg-gradient-to-br from-slate-50 to-sky-50 p-6 shadow-sm md:grid-cols-[1fr_auto] md:items-center">
             <div>
-              <h2 className="text-2xl font-semibold text-slate-950">
-                {language === "zh" ? "产品图片只是部分加工示例" : "Product photos show part of our manufacturing scope"}
+              <div className="eyebrow">{language === "zh" ? "定制说明" : "Custom Note"}</div>
+              <h2 className="mt-3 text-2xl font-semibold text-slate-950">
+                {language === "zh" ? "没有找到对应产品？支持来图来样加工" : "Can’t find the part you need?"}
               </h2>
               <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-600">{copy.productExplorer.note}</p>
             </div>

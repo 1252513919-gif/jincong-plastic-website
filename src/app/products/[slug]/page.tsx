@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
   if (product) {
     return {
       title: `${product.nameZh} | 注塑加工定制`,
-      description: `${product.nameZh}属于${product.categoryZh}，支持来图来样定制、小批量试产、OEM代工和工厂直供。`
+      description: `${product.nameZh}属于${product.categoryZh}，支持来图来样定制、小批量试产、OEM/ODM 和工厂直供。`
     };
   }
 
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
 
   return {
     title: `${legacyProduct.name} | 注塑加工定制`,
-    description: `${legacyProduct.name}支持来图来样定制、小批量试产、OEM代工和工厂直供。`
+    description: `${legacyProduct.name}支持来图来样定制、小批量试产、OEM/ODM 和工厂直供。`
   };
 }
 

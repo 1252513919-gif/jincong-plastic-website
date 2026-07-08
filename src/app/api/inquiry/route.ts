@@ -5,9 +5,11 @@ import { site } from "@/lib/site";
 export const runtime = "nodejs";
 
 type InquiryPayload = {
+  language?: "zh" | "en";
   name?: string;
   company?: string;
-  contact?: string;
+  phone?: string;
+  wechat?: string;
   email?: string;
   product?: string;
   category?: string;
@@ -18,18 +20,18 @@ type InquiryPayload = {
   sourcePage?: string;
 };
 
-const fields: Array<[keyof InquiryPayload, string]> = [
-  ["name", "客户姓名"],
-  ["company", "公司名称"],
-  ["contact", "联系方式"],
-  ["email", "邮箱"],
-  ["product", "产品需求"],
-  ["category", "产品类别"],
-  ["quantity", "预计数量"],
-  ["material", "材料要求"],
-  ["drawing", "图纸/样品情况"],
-  ["message", "需求描述"],
-  ["sourcePage", "来源页面"]
+const fields: Array<[keyof InquiryPayload, string, string]> = [
+  ["name", "姓名", "Name"],
+  ["company", "公司名称", "Company"],
+  ["phone", "电话", "Phone"],
+  ["wechat", "微信", "WeChat"],
+  ["email", "邮箱", "Email"],
+  ["category", "产品类型", "Product Type"],
+  ["material", "材料", "Material"],
+  ["quantity", "数量", "Quantity"],
+  ["drawing", "是否有图纸/样品", "Drawing or Sample Available"],
+  ["message", "需求描述", "Requirement Details"],
+  ["sourcePage", "来源页面", "Source Page"]
 ];
 
 export async function POST(request: Request) {
@@ -41,8 +43,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Invalid request body" }, { status: 400 });
   }
 
-  if (!payload.contact?.trim() || !payload.product?.trim()) {
-    return NextResponse.json({ message: "Contact and product requirement are required" }, { status: 400 });
+  if ((!payload.phone?.trim() && !payload.wechat?.trim()) || !payload.message?.trim()) {
+    return NextResponse.json({ message: "Phone or WeChat and requirement details are required" }, { status: 400 });
   }
 
   const host = process.env.SMTP_HOST;
@@ -55,16 +57,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "SMTP is not configured" }, { status: 503 });
   }
 
+  const isEn = payload.language === "en";
   const submittedAt = new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
+  const subject = isEn
+    ? "[Website Inquiry] Custom Plastic Parts Requirement Submitted"
+    : "【网站询盘】客户提交了塑料件定制需求";
+
   const rows = fields
-    .map(([key, label]) => `<tr><td style="padding:8px 12px;border:1px solid #e2e8f0;font-weight:600;">${label}</td><td style="padding:8px 12px;border:1px solid #e2e8f0;">${escapeHtml(payload[key] || "-")}</td></tr>`)
+    .map(([key, zhLabel, enLabel]) => {
+      const label = `${zhLabel} / ${enLabel}`;
+      return `<tr><td style="padding:8px 12px;border:1px solid #e2e8f0;font-weight:600;">${escapeHtml(label)}</td><td style="padding:8px 12px;border:1px solid #e2e8f0;">${escapeHtml(payload[key] || "-")}</td></tr>`;
+    })
     .join("");
 
   const text = [
-    "【官网询盘】来自邢台锦聪橡塑有限公司官网的新客户需求",
+    subject,
     "",
-    ...fields.map(([key, label]) => `${label}: ${payload[key] || "-"}`),
-    `提交时间: ${submittedAt}`
+    ...fields.map(([key, zhLabel, enLabel]) => `${zhLabel} / ${enLabel}: ${payload[key] || "-"}`),
+    `提交时间 / Submission Time: ${submittedAt}`
   ].join("\n");
 
   const transporter = nodemailer.createTransport({
@@ -78,13 +88,13 @@ export async function POST(request: Request) {
     from: `"锦聪官网询盘" <${user}>`,
     to: receiver,
     replyTo: payload.email || undefined,
-    subject: "【官网询盘】来自邢台锦聪橡塑有限公司官网的新客户需求",
+    subject,
     text,
     html: `
       <div style="font-family:Arial,'Microsoft YaHei',sans-serif;color:#0f172a;">
-        <h2>【官网询盘】来自邢台锦聪橡塑有限公司官网的新客户需求</h2>
+        <h2>${escapeHtml(subject)}</h2>
         <table style="border-collapse:collapse;width:100%;max-width:760px;">${rows}
-          <tr><td style="padding:8px 12px;border:1px solid #e2e8f0;font-weight:600;">提交时间</td><td style="padding:8px 12px;border:1px solid #e2e8f0;">${submittedAt}</td></tr>
+          <tr><td style="padding:8px 12px;border:1px solid #e2e8f0;font-weight:600;">提交时间 / Submission Time</td><td style="padding:8px 12px;border:1px solid #e2e8f0;">${escapeHtml(submittedAt)}</td></tr>
         </table>
       </div>
     `

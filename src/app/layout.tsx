@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: `${site.name}｜注塑加工｜塑料件定制｜OEM/ODM`,
     description: "来图来样加工、小批量试产、OEM/ODM、工厂直供。",
-    images: ["/images/hero-injection-factory.png"],
+    images: ["/images/logo/jincong-logo.jpg"],
     locale: "zh_CN",
     type: "website"
   }

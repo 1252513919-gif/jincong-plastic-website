@@ -19,9 +19,10 @@ export function ProductDetailPageView({ slug }: ProductDetailPageViewProps) {
 
   if (product) {
     const title = language === "zh" ? product.nameZh : product.nameEn;
-    const secondaryTitle = language === "zh" ? product.nameEn : product.nameZh;
     const category = language === "zh" ? product.categoryZh : product.categoryEn;
+    const subCategory = language === "zh" ? product.subCategoryZh : product.subCategoryEn;
     const usage = language === "zh" ? product.usageZh : product.usageEn;
+    const industries = language === "zh" ? product.industriesZh || product.industries : product.industriesEn || product.industries;
 
     return (
       <>
@@ -61,6 +62,11 @@ export function ProductDetailPageView({ slug }: ProductDetailPageViewProps) {
                   <span className="rounded-full border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700">
                     {category}
                   </span>
+                  {subCategory && (
+                    <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700">
+                      {subCategory}
+                    </span>
+                  )}
                   {product.customizable && (
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700">
                       <BadgeCheck className="h-3.5 w-3.5 text-sky-600" />
@@ -70,13 +76,12 @@ export function ProductDetailPageView({ slug }: ProductDetailPageViewProps) {
                 </div>
 
                 <h1 className="mt-6 text-3xl font-semibold text-slate-950 sm:text-4xl">{title}</h1>
-                <p className="mt-2 text-sm uppercase tracking-[0.16em] text-slate-400">{secondaryTitle}</p>
 
                 <div className="mt-8 grid gap-5">
-                  <DetailBlock title={language === "zh" ? "所属分类" : "Category"} items={[category]} />
-                  <DetailBlock title={language === "zh" ? "可选材料" : "Available Materials"} items={product.material} />
+                  <DetailBlock title={language === "zh" ? "所属分类" : "Category"} items={subCategory ? [category, subCategory] : [category]} />
+                  <DetailBlock title={language === "zh" ? "可选材质" : "Available Materials"} items={product.material} />
                   <DetailBlock title={language === "zh" ? "主要用途" : "Application"} items={[usage]} />
-                  <DetailBlock title={language === "zh" ? "适用行业" : "Industries"} items={product.industries} />
+                  <DetailBlock title={language === "zh" ? "适用行业" : "Industries"} items={industries} />
                 </div>
 
                 <Link

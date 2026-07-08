@@ -1,42 +1,52 @@
 {
+  "pet-plastic-products": {
+    "categoryZh": "宠物用品系列",
+    "categoryEn": "Pet Product Parts",
+    "defaultMaterial": ["PP", "PE", "ABS", "TPE", "Silicone"],
+    "usageZh": "用于宠物出行、喂养、饮水、清洁、笼具、玩具及护理用品中的塑料结构件和配件。",
+    "usageEn": "Used for plastic structural parts and fittings in pet travel, feeding, watering, cleaning, cages, toys and care products.",
+    "industries": ["宠物用品", "消费品", "家居用品", "电商定制"],
+    "industriesZh": ["宠物用品", "消费品", "家居用品", "电商定制"],
+    "industriesEn": ["Pet products", "Consumer goods", "Home products", "E-commerce customization"]
+  },
+  "electronic-electrical-plastic-parts": {
+    "categoryZh": "电子电气塑料件系列",
+    "categoryEn": "Electrical & Electronic Plastic Parts",
+    "defaultMaterial": ["ABS", "PC", "PA", "PP", "PBT", "PET"],
+    "usageZh": "用于电子外壳、绝缘配件、支架、端盖、保护盖、开关配件及仪器仪表壳体。",
+    "usageEn": "Used for electronic housings, insulating parts, brackets, end caps, protective covers, switch fittings and instrument enclosures.",
+    "industries": ["电子电气", "仪器仪表", "通讯数码", "电源开关", "音响设备"],
+    "industriesZh": ["电子电气", "仪器仪表", "通讯数码", "电源开关", "音响设备"],
+    "industriesEn": ["Electronics", "Instrumentation", "Digital communication", "Power switches", "Audio equipment"]
+  },
+  "furniture-plastic-fittings": {
+    "categoryZh": "家具塑料配件系列",
+    "categoryEn": "Furniture Plastic Accessories",
+    "defaultMaterial": ["PP", "PE", "PVC", "ABS", "Nylon"],
+    "usageZh": "用于家具脚垫、管塞、孔盖、装饰盖、连接件、防滑保护和端部封口。",
+    "usageEn": "Used for furniture glides, tube plugs, hole caps, decorative caps, connectors, anti-slip protection and end sealing.",
+    "industries": ["家具制造", "五金配件", "家居用品", "办公家具"],
+    "industriesZh": ["家具制造", "五金配件", "家居用品", "办公家具"],
+    "industriesEn": ["Furniture manufacturing", "Hardware fittings", "Home products", "Office furniture"]
+  },
   "plastic-washers": {
-    "categoryZh": "塑料平垫 / 垫片系列",
-    "categoryEn": "Plastic Washers & Gaskets",
-    "defaultMaterial": ["PP", "PE", "PA", "POM", "ABS", "PVC", "Nylon", "Rubber", "Silicone"],
-    "usageZh": "用于紧固连接、密封隔离、绝缘防护、间隔定位、缓冲减震等装配场景。",
+    "categoryZh": "平垫系列",
+    "categoryEn": "Flat Washers",
+    "defaultMaterial": ["PP", "PE", "PA/Nylon", "POM", "ABS", "PVC", "PC", "Rubber", "Silicone"],
+    "usageZh": "用于紧固、密封、绝缘、间隔、定位、缓冲和非标装配场景。",
     "usageEn": "Used for fastening, sealing, insulation, spacing, positioning and cushioning applications.",
-    "industries": ["机械设备", "电子电器", "家具配件", "宠物用品", "汽车配套"]
+    "industries": ["机械装配", "电子电气", "汽车配件", "家具配件", "宠物用品"],
+    "industriesZh": ["机械装配", "电子电气", "汽车配件", "家具配件", "宠物用品"],
+    "industriesEn": ["Mechanical assembly", "Electronics", "Automotive parts", "Furniture fittings", "Pet products"]
   },
   "automotive-plastic-parts": {
     "categoryZh": "汽车塑料件系列",
     "categoryEn": "Automotive Plastic Parts",
-    "defaultMaterial": ["PP", "ABS", "PA", "POM", "PC"],
-    "usageZh": "用于汽车内外饰、卡扣固定、线束保护、支架安装、电气外壳和防护盖板等场景。",
-    "usageEn": "Used for automotive trim, clips, wire harness protection, mounting brackets, electrical housings and protective covers.",
-    "industries": ["汽车配套", "维修替换件", "线束系统", "车辆内外饰"]
-  },
-  "pet-plastic-products": {
-    "categoryZh": "宠物用品塑料件系列",
-    "categoryEn": "Pet Products Plastic Parts",
-    "defaultMaterial": ["PP", "PE", "ABS", "TPE", "Silicone"],
-    "usageZh": "用于宠物喂养、饮水、清洁、出行、笼具、玩具和护理用品的塑料结构件与配件。",
-    "usageEn": "Used for plastic structural parts and fittings in pet feeding, watering, cleaning, travel, cages, toys and care products.",
-    "industries": ["宠物用品", "消费品", "家居用品", "电商定制"]
-  },
-  "furniture-plastic-fittings": {
-    "categoryZh": "家具塑料配件系列",
-    "categoryEn": "Furniture Plastic Fittings",
-    "defaultMaterial": ["PP", "PE", "PVC", "ABS", "Nylon"],
-    "usageZh": "用于家具脚塞、管塞、孔盖、装饰盖、连接扣件、防滑保护和端部封口等场景。",
-    "usageEn": "Used for furniture foot plugs, tube inserts, hole caps, decorative caps, connectors, anti-slip protection and end sealing.",
-    "industries": ["家具制造", "五金配件", "家居用品", "办公家具"]
-  },
-  "electronic-electrical-plastic-parts": {
-    "categoryZh": "电子电器塑料配件系列",
-    "categoryEn": "Electronic & Electrical Plastic Parts",
-    "defaultMaterial": ["ABS", "PC", "PA", "PP", "PBT", "PET"],
-    "usageZh": "用于电子电器外壳、绝缘件、支架、端盖、保护盖、开关配件和仪器仪表壳体等场景。",
-    "usageEn": "Used for electronic and electrical housings, insulating parts, brackets, end caps, protective covers, switch fittings and instrument enclosures.",
-    "industries": ["电子电器", "仪器仪表", "通讯数码", "电源开关", "音响设备"]
+    "defaultMaterial": ["PP", "PA/Nylon", "POM", "ABS", "PC", "PBT"],
+    "usageZh": "用于汽车卡扣、堵盖、支架、内饰件、外饰件、电气保护件及线束固定配件。",
+    "usageEn": "Used for automotive clips, plugs, brackets, interior parts, exterior parts, electrical protection and wire harness fittings.",
+    "industries": ["汽车配件", "维修替换件", "线束固定", "内外饰件"],
+    "industriesZh": ["汽车配件", "维修替换件", "线束固定", "内外饰件"],
+    "industriesEn": ["Automotive parts", "Replacement parts", "Wire harness fixing", "Interior and exterior trim"]
   }
 }
