@@ -7,6 +7,8 @@ import { site } from "@/lib/site";
 
 type SubmitState = "idle" | "submitting" | "success" | "error" | "validation";
 
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export function InquiryForm() {
   const { language, copy } = useLanguage();
   const [state, setState] = useState<SubmitState>("idle");
@@ -19,6 +21,7 @@ export function InquiryForm() {
       language,
       name: String(data.get("name") || ""),
       company: String(data.get("company") || ""),
+      country: String(data.get("country") || ""),
       phone: String(data.get("phone") || ""),
       wechat: String(data.get("wechat") || ""),
       email: String(data.get("email") || ""),
@@ -31,19 +34,25 @@ export function InquiryForm() {
       sourcePage: window.location.href
     };
 
-    if ((!payload.phone.trim() && !payload.wechat.trim()) || !payload.message.trim()) {
+    if (!payload.name.trim() || (!payload.phone.trim() && !payload.wechat.trim()) || !payload.message.trim()) {
+      setState("validation");
+      return;
+    }
+
+    if (payload.email.trim() && !emailPattern.test(payload.email.trim())) {
       setState("validation");
       return;
     }
 
     setState("submitting");
     try {
-      const response = await fetch("/api/inquiry", {
+      const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      if (!response.ok) throw new Error("request failed");
+      const result = (await response.json().catch(() => null)) as { success?: boolean; error?: string } | null;
+      if (!response.ok || !result?.success) throw new Error(result?.error || "request failed");
       setState("success");
       form.reset();
     } catch {
@@ -56,6 +65,7 @@ export function InquiryForm() {
       <div className="grid gap-5 md:grid-cols-2">
         <Field label={copy.inquiry.name} name="name" placeholder={copy.inquiry.placeholders.name} />
         <Field label={copy.inquiry.company} name="company" placeholder={copy.inquiry.placeholders.company} />
+        <Field label={copy.inquiry.country} name="country" placeholder={copy.inquiry.placeholders.country} />
         <Field label={copy.inquiry.phone} name="phone" placeholder={copy.inquiry.placeholders.phone} />
         <Field label={copy.inquiry.wechat} name="wechat" placeholder={copy.inquiry.placeholders.wechat} />
         <Field label={copy.inquiry.email} name="email" type="email" placeholder={copy.inquiry.placeholders.email} />

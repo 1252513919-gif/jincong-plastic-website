@@ -176,6 +176,7 @@ export const content = {
     inquiry: {
       name: "姓名",
       company: "公司名称",
+      country: "国家/地区",
       phone: "电话",
       wechat: "微信",
       email: "邮箱",
@@ -188,6 +189,7 @@ export const content = {
       placeholders: {
         name: "请输入姓名",
         company: "选填",
+        country: "如：中国 / United States",
         phone: "电话或手机号",
         wechat: "微信号，至少与电话填写一项",
         email: "example@company.com",
@@ -199,10 +201,10 @@ export const content = {
       drawingOptions: ["有图纸", "有样品", "有产品图片", "暂时没有"],
       submit: "提交询盘",
       submitting: "正在提交...",
-      success: "提交成功，我们已收到您的定制需求。",
+      success: "询盘提交成功，我们会尽快与您联系。",
       successDetail: "我们会根据您提供的产品用途、材料、数量和图纸/样品情况，尽快与您联系确认加工方案。",
       error: "提交暂时未成功，您可以直接通过以下方式联系我们：",
-      validation: "请至少填写电话或微信，并填写需求描述。"
+      validation: "请填写姓名、电话或微信、需求描述；如果填写邮箱，请确认邮箱格式正确。"
     },
     footer: {
       summary: "注塑加工、塑料件定制、来图来样加工、小批量试产、OEM/ODM 和工厂直连沟通。"
@@ -362,6 +364,7 @@ export const content = {
     inquiry: {
       name: "Name",
       company: "Company",
+      country: "Country",
       phone: "Phone",
       wechat: "WeChat",
       email: "Email",
@@ -374,6 +377,7 @@ export const content = {
       placeholders: {
         name: "Your name",
         company: "Optional",
+        country: "e.g. China / United States",
         phone: "Phone or mobile number",
         wechat: "WeChat ID, required if phone is empty",
         email: "example@company.com",
@@ -385,10 +389,10 @@ export const content = {
       drawingOptions: ["Drawing available", "Sample available", "Product photos available", "Not yet"],
       submit: "Submit Inquiry",
       submitting: "Submitting...",
-      success: "Submitted successfully. We have received your requirement.",
+      success: "Your inquiry has been submitted successfully. We will contact you soon.",
       successDetail: "We will review your product use, material, quantity, drawing or sample information, and contact you as soon as possible to confirm the processing solution.",
-      error: "Submission was not completed. You can contact us directly:",
-      validation: "Please fill in at least phone or WeChat, and describe your requirement."
+      error: "Submission failed temporarily. You can contact us directly:",
+      validation: "Please fill in your name, phone or WeChat, and requirement details. If you enter an email, please use a valid email format."
     },
     footer: {
       summary: "Injection molding, custom plastic parts, drawing/sample manufacturing, small-batch trial production, OEM/ODM and direct factory communication."
