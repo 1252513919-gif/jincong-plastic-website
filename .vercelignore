@@ -7,5 +7,7 @@ dist
 outputs
 work
 tsconfig.tsbuildinfo
-
+.git
 .vercel
+next-server.out.log
+next-server.err.log
