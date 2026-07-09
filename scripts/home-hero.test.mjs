@@ -63,3 +63,19 @@ test("orbit is a four-ring contained manufacturing visualization", async () => {
   assert.match(source, /items\.map/);
   assert.doesNotMatch(source, /180\+/);
 });
+
+test("homepage delegates only its first section to HomeHero", async () => {
+  const page = await readFile(
+    sourceFile("src/components/HomePage.tsx"),
+    "utf8"
+  );
+  const hero = await readFile(
+    sourceFile("src/components/home/HomeHero.tsx"),
+    "utf8"
+  );
+
+  assert.match(page, /<HomeHero\s*\/>/);
+  assert.match(hero, /<OrbitVisualization/);
+  assert.match(hero, /<CapabilityTicker/);
+  assert.doesNotMatch(hero, /framer-motion/);
+});
