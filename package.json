@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "test:hero": "node --test scripts/home-hero.test.mjs",
     "generate:products": "tsx scripts/generate-products-from-images.ts",
     "check:images": "tsx scripts/check-product-images.ts"
   },

@@ -1,57 +1,66 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Globe2, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { ArrowUpRight, Globe2, Menu, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { localizedPath, stripLocale } from "@/i18n/routing";
 import { site } from "@/lib/site";
+import "@/styles/home-hero.css";
 
 export function SiteHeader() {
   const pathname = usePathname();
   const { language, copy, toggleLanguage } = useLanguage();
   const [open, setOpen] = useState(false);
   const cleanPath = stripLocale(pathname);
+  const quoteLabel =
+    language === "zh" ? copy.actions.quote : "Request a Quote";
+
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/70 bg-white/82 shadow-[0_18px_60px_rgba(15,23,42,0.08)] backdrop-blur-2xl">
-      <div className="section-shell flex h-20 items-center justify-between">
-        <Link href={localizedPath(language, "/")} className="flex min-w-0 items-center gap-3" aria-label={site.name}>
-          <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_30px_rgba(15,23,42,0.1)]">
-            <Image
-              src="/images/logo/jincong-logo.jpg"
-              alt={`${site.name} Logo`}
-              fill
-              sizes="44px"
-              className="scale-[1.38] object-cover object-[center_30%]"
-              priority
-            />
+    <header className="site-header-editorial">
+      <div className="site-header-editorial__inner">
+        <Link
+          href={localizedPath(language, "/")}
+          className="site-header-editorial__brand"
+          aria-label={site.name}
+        >
+          <span className="site-header-editorial__wordmark">
+            Jincong Plastic
           </span>
-          <span className="min-w-0">
-            <span className="block truncate text-sm font-semibold text-slate-950 sm:text-base">
-              {language === "zh" ? site.name : "Jincong Rubber & Plastic"}
-            </span>
-            <span className="mt-0.5 block truncate text-[10px] uppercase tracking-[0.22em] text-slate-500">
-              Injection Molding
-            </span>
+          <span className="site-header-editorial__descriptor">
+            {language === "zh" ? site.name : "Injection Molding"}
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex" aria-label={language === "zh" ? "主导航" : "Primary navigation"}>
+        <nav
+          className="site-header-editorial__nav"
+          aria-label={language === "zh" ? "主导航" : "Primary navigation"}
+        >
           {copy.nav.map((item) => {
             const href = localizedPath(language, item.href);
-            const active = item.href === "/" ? cleanPath === "/" : cleanPath.startsWith(item.href);
+            const active =
+              item.href === "/"
+                ? cleanPath === "/"
+                : cleanPath.startsWith(item.href);
+
             return (
               <Link
                 key={item.href}
                 href={href}
-                className={`rounded-full px-3 py-2 text-sm transition ${
-                  active
-                    ? "bg-slate-950 text-white shadow-sm"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+                className={`site-header-editorial__nav-link${
+                  active ? " is-active" : ""
                 }`}
+                aria-current={active ? "page" : undefined}
               >
                 {item.label}
               </Link>
@@ -59,70 +68,94 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className="hidden items-center gap-2 lg:flex">
+        <div className="site-header-editorial__actions">
           <button
             type="button"
             onClick={toggleLanguage}
-            className="inline-flex h-10 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-sm text-slate-600 transition hover:border-sky-200 hover:bg-sky-50 hover:text-slate-950"
+            className="site-header-editorial__language"
           >
-            <Globe2 className="h-4 w-4" />
+            <Globe2 aria-hidden="true" size={16} strokeWidth={1.8} />
             {copy.altLang}
           </button>
           <Link
             href={localizedPath(language, "/contact")}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-slate-950 px-4 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(15,23,42,0.18)] transition hover:-translate-y-0.5 hover:bg-sky-700"
+            className="site-header-editorial__quote"
           >
-            {copy.actions.quote}
-            <ArrowRight className="h-4 w-4" />
+            {quoteLabel}
+            <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.8} />
           </Link>
         </div>
 
         <button
-          className="grid h-11 w-11 place-items-center rounded-full border border-slate-200 bg-white text-slate-950 shadow-sm lg:hidden"
+          type="button"
+          className="site-header-editorial__menu-button"
           onClick={() => setOpen((value) => !value)}
-          aria-label={language === "zh" ? "打开菜单" : "Open menu"}
+          aria-label={
+            language === "zh"
+              ? open
+                ? "关闭菜单"
+                : "打开菜单"
+              : open
+                ? "Close menu"
+                : "Open menu"
+          }
+          aria-expanded={open}
+          aria-controls="site-mobile-menu"
         >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          <span>{language === "zh" ? "菜单" : "Menu"}</span>
+          {open ? (
+            <X aria-hidden="true" size={17} />
+          ) : (
+            <Menu aria-hidden="true" size={17} />
+          )}
         </button>
       </div>
 
-      {open && (
-        <div className="border-t border-slate-200 bg-white/96 px-5 py-4 shadow-lg backdrop-blur-xl lg:hidden">
-          <nav className="grid gap-2" aria-label={language === "zh" ? "移动端导航" : "Mobile navigation"}>
-            {copy.nav.map((item) => (
-              <Link
-                key={item.href}
-                href={localizedPath(language, item.href)}
-                onClick={() => setOpen(false)}
-                className="rounded-2xl px-3 py-3 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
-              >
-                {item.label}
-              </Link>
-            ))}
-            <div className="mt-2 grid gap-2 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={() => {
-                  toggleLanguage();
-                  setOpen(false);
-                }}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700"
-              >
-                <Globe2 className="h-4 w-4" />
-                {copy.altLang}
-              </button>
-              <Link
-                href={localizedPath(language, "/contact")}
-                onClick={() => setOpen(false)}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-4 py-3 text-sm font-semibold text-white"
-              >
-                {copy.actions.quote}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </nav>
+      <div
+        className={`site-header-editorial__drawer${open ? " is-open" : ""}`}
+        id="site-mobile-menu"
+        aria-hidden={!open}
+      >
+        <nav
+          className="site-header-editorial__drawer-nav"
+          aria-label={language === "zh" ? "移动端导航" : "Mobile navigation"}
+        >
+          {copy.nav.map((item, index) => (
+            <Link
+              key={item.href}
+              href={localizedPath(language, item.href)}
+              onClick={() => setOpen(false)}
+              tabIndex={open ? 0 : -1}
+              style={{ transitionDelay: open ? `${80 + index * 35}ms` : "0ms" }}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="site-header-editorial__drawer-footer">
+          <button
+            type="button"
+            onClick={() => {
+              toggleLanguage();
+              setOpen(false);
+            }}
+            tabIndex={open ? 0 : -1}
+          >
+            <Globe2 aria-hidden="true" size={17} />
+            {copy.altLang}
+          </button>
+          <Link
+            href={localizedPath(language, "/contact")}
+            onClick={() => setOpen(false)}
+            tabIndex={open ? 0 : -1}
+          >
+            {quoteLabel}
+            <ArrowUpRight aria-hidden="true" size={17} />
+          </Link>
+          <p>© {new Date().getFullYear()} Jincong Plastic</p>
         </div>
-      )}
+      </div>
     </header>
   );
 }
