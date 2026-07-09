@@ -44,3 +44,22 @@ test("ticker and CTA preserve accessibility contracts", async () => {
   assert.match(button, /from "next\/link"/);
   assert.match(button, /home-hero__primary-button/);
 });
+
+test("orbit is a four-ring contained manufacturing visualization", async () => {
+  const source = await readFile(
+    sourceFile("src/components/home/OrbitVisualization.tsx"),
+    "utf8"
+  );
+
+  for (const ring of [
+    "orbit--one",
+    "orbit--two",
+    "orbit--three",
+    "orbit--four"
+  ]) {
+    assert.match(source, new RegExp(ring));
+  }
+
+  assert.match(source, /items\.map/);
+  assert.doesNotMatch(source, /180\+/);
+});
