@@ -28,3 +28,19 @@ test("hero content contains approved complete manufacturing copy", async () => {
   assert.doesNotMatch(source, /180\+/);
   assert.doesNotMatch(source, /["']Drawi["']/);
 });
+
+test("ticker and CTA preserve accessibility contracts", async () => {
+  const ticker = await readFile(
+    sourceFile("src/components/home/CapabilityTicker.tsx"),
+    "utf8"
+  );
+  const button = await readFile(
+    sourceFile("src/components/home/GradientButton.tsx"),
+    "utf8"
+  );
+
+  assert.match(ticker, /aria-hidden/);
+  assert.match(ticker, /home-hero__ticker-track/);
+  assert.match(button, /from "next\/link"/);
+  assert.match(button, /home-hero__primary-button/);
+});
