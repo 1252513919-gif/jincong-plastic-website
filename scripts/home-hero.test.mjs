@@ -103,3 +103,52 @@ test("shared header does not synchronously reset menu state in an effect", async
     /useEffect\(\(\) => \{\s*setOpen\(false\);\s*\}, \[pathname\]\)/
   );
 });
+
+test("root layout preconnects and loads the approved font families", async () => {
+  const source = await readFile(sourceFile("src/app/layout.tsx"), "utf8");
+
+  assert.match(source, /eslint-disable @next\/next\/no-page-custom-font/);
+  assert.match(source, /rel="preconnect" href="https:\/\/fonts\.googleapis\.com"/);
+  assert.match(source, /fonts\.gstatic\.com/);
+  assert.match(source, /family=Inter:wght@400;500;600;700/);
+  assert.match(source, /family=Source\+Serif\+4:ital,wght@0,400;0,600;1,400;1,600/);
+});
+
+test("hero stacks its main content and capability strip vertically", async () => {
+  const source = await readFile(sourceFile("src/styles/home-hero.css"), "utf8");
+  const heroRule = source.match(/\.home-hero\s*\{([\s\S]*?)\}/)?.[1] ?? "";
+
+  assert.match(heroRule, /flex-direction:\s*column/);
+});
+
+test("mobile drawer has an explicit viewport-based height", async () => {
+  const source = await readFile(sourceFile("src/styles/home-hero.css"), "utf8");
+
+  assert.match(source, /height:\s*calc\(100dvh - 76px\)/);
+  assert.match(source, /height:\s*calc\(100dvh - 72px\)/);
+});
+
+test("desktop headline and compact ticker preserve complete text", async () => {
+  const source = await readFile(sourceFile("src/styles/home-hero.css"), "utf8");
+
+  assert.match(source, /\.home-hero__title > span[\s\S]*?white-space:\s*nowrap/);
+  assert.match(
+    source,
+    /\.home-hero__ticker--compact \.home-hero__ticker-track[\s\S]*?steps\(8,\s*end\)/
+  );
+  assert.match(
+    source,
+    /\.home-hero__ticker--compact \.home-hero__ticker-item[\s\S]*?width:\s*160px/
+  );
+});
+
+test("desktop header reserves an explicit column for actions", async () => {
+  const source = await readFile(sourceFile("src/styles/home-hero.css"), "utf8");
+  const headerInner =
+    source.match(/\.site-header-editorial__inner\s*\{([\s\S]*?)\}/)?.[1] ?? "";
+
+  assert.match(
+    headerInner,
+    /grid-template-columns:\s*170px minmax\(0,\s*1fr\) auto/
+  );
+});
