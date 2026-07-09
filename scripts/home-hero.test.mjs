@@ -79,3 +79,27 @@ test("homepage delegates only its first section to HomeHero", async () => {
   assert.match(hero, /<CapabilityTicker/);
   assert.doesNotMatch(hero, /framer-motion/);
 });
+
+test("shared header keeps routing and language behavior", async () => {
+  const source = await readFile(
+    sourceFile("src/components/SiteHeader.tsx"),
+    "utf8"
+  );
+
+  assert.match(source, /Jincong Plastic/);
+  assert.match(source, /toggleLanguage/);
+  assert.match(source, /copy\.nav\.map/);
+  assert.match(source, /aria-expanded/);
+});
+
+test("shared header does not synchronously reset menu state in an effect", async () => {
+  const source = await readFile(
+    sourceFile("src/components/SiteHeader.tsx"),
+    "utf8"
+  );
+
+  assert.doesNotMatch(
+    source,
+    /useEffect\(\(\) => \{\s*setOpen\(false\);\s*\}, \[pathname\]\)/
+  );
+});
