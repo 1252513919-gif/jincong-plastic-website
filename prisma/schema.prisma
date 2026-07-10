@@ -1,0 +1,174 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum LeadStatus {
+  NEW
+  RESEARCHED
+  CONTACTED
+  REPLIED
+  BOUNCED
+  REJECTED
+  DO_NOT_CONTACT
+}
+
+enum EmailDraftType {
+  FIRST_TOUCH
+  FOLLOW_UP
+}
+
+enum EmailDraftStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  SENDING
+  SENT
+  FAILED
+  REJECTED
+  CANCELLED
+}
+
+enum EmailLogStatus {
+  SENT
+  FAILED
+  SKIPPED
+  CANCELLED
+}
+
+enum ContactVerificationStatus {
+  UNVERIFIED
+  VERIFIED
+  INVALID
+  STALE
+}
+
+enum SuppressionType {
+  EMAIL
+  DOMAIN
+}
+
+enum SuppressionReason {
+  UNSUBSCRIBE
+  REJECTED
+  BOUNCED
+  MANUAL
+}
+
+model Lead {
+  id                        String                    @id @default(cuid())
+  companyName               String
+  region                    String?
+  industry                  String?
+  website                   String?
+  publicEmail               String?
+  publicPhone               String?
+  contactPerson             String?
+  sourceUrl                 String?
+  priority                  String?                   @default("MEDIUM")
+  productCategory           String?
+  productSummary            String?
+  potentialPlasticParts     String?
+  personalizationReason     String?
+  status                    LeadStatus                @default(NEW)
+  contactVerifiedAt         DateTime?
+  contactVerificationStatus ContactVerificationStatus @default(UNVERIFIED)
+  contactSourceUrl          String?
+  lastResearchAt            DateTime?
+  websiteSnapshot           String?
+  lastContactedAt           DateTime?
+  repliedAt                 DateTime?
+  hasFollowedUp             Boolean                   @default(false)
+  doNotContactReason        String?
+  notes                     String?
+  createdAt                 DateTime                  @default(now())
+  updatedAt                 DateTime                  @updatedAt
+
+  drafts EmailDraft[]
+  logs   EmailLog[]
+
+  @@index([companyName])
+  @@index([publicEmail])
+  @@index([status])
+  @@index([contactVerificationStatus])
+}
+
+model EmailDraft {
+  id             String           @id @default(cuid())
+  leadId         String
+  lead           Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type           EmailDraftType
+  recipient      String
+  subject        String
+  body           String
+  status         EmailDraftStatus @default(DRAFT)
+  version        Int              @default(1)
+  idempotencyKey String           @unique
+  approvedAt     DateTime?
+  sentAt         DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  logs EmailLog[]
+
+  @@index([leadId])
+  @@index([status])
+  @@unique([leadId, type, version])
+}
+
+model EmailLog {
+  id                String         @id @default(cuid())
+  leadId            String
+  lead              Lead           @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  draftId           String?
+  draft             EmailDraft?    @relation(fields: [draftId], references: [id], onDelete: SetNull)
+  type              EmailDraftType
+  intendedRecipient String
+  actualRecipient   String
+  subject           String
+  body              String
+  status            EmailLogStatus
+  testMode          Boolean
+  smtpUser          String?
+  errorMessage      String?
+  idempotencyKey    String         @unique
+  sentAt            DateTime?
+  createdAt         DateTime       @default(now())
+
+  @@index([leadId])
+  @@index([draftId])
+  @@index([createdAt])
+}
+
+model SuppressionList {
+  id           String            @id @default(cuid())
+  type         SuppressionType
+  value        String
+  reason       SuppressionReason
+  sourceLeadId String?
+  notes        String?
+  createdAt    DateTime          @default(now())
+
+  @@unique([type, value])
+  @@index([value])
+}
+
+model SystemSetting {
+  id                     String    @id @default("lead-dev")
+  testMode               Boolean   @default(true)
+  paused                 Boolean   @default(false)
+  stopAllSending         Boolean   @default(false)
+  dailySendLimit         Int       @default(8)
+  minSendIntervalMinutes Int       @default(3)
+  maxSendIntervalMinutes Int       @default(8)
+  sendWindowStart        String    @default("09:00")
+  sendWindowEnd          String    @default("17:30")
+  timezone               String    @default("Asia/Shanghai")
+  lastSentAt             DateTime?
+  nextAllowedSendAt      DateTime?
+  updatedAt              DateTime  @updatedAt
+}

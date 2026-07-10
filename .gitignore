@@ -7,6 +7,8 @@ dist
 outputs
 work
 tsconfig.tsbuildinfo
+prisma/*.db
+prisma/*.db-journal
 
 .vercel
 .worktrees/

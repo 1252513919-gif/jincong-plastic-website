@@ -9,10 +9,18 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test:hero": "node --test scripts/home-hero.test.mjs",
+    "test:lead-dev": "tsx --test scripts/lead-dev.test.ts",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "tsx prisma/seed.ts",
+    "db:push": "prisma db push",
+    "lead-dev:init-db": "node scripts/init-lead-dev-db.mjs",
+    "lead-dev:hash-password": "node scripts/hash-lead-admin-password.mjs",
     "generate:products": "tsx scripts/generate-products-from-images.ts",
     "check:images": "tsx scripts/check-product-images.ts"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.0",
     "framer-motion": "^12.42.2",
     "gsap": "^3.15.0",
     "lenis": "^1.3.25",
@@ -31,6 +39,7 @@
     "eslint": "^9.39.1",
     "eslint-config-next": "16.2.9",
     "postcss": "^8.4.49",
+    "prisma": "^6.19.0",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3"
