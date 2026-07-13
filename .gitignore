@@ -9,6 +9,12 @@ work
 tsconfig.tsbuildinfo
 prisma/*.db
 prisma/*.db-journal
+.local-backups/
+local-backups/
+backup/
+backups/
+*.sqlite
+*.sqlite-journal
 
 .vercel
 .worktrees/

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function LeadDevLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-slate-50">
+    <div className="bg-slate-50 pt-24">
       <div className="border-b border-slate-200 bg-white/95 px-6 py-4">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
           <div>

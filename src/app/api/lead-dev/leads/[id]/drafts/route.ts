@@ -16,6 +16,8 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       lead.drafts.filter((draft) => draft.type === type).reduce((max, draft) => Math.max(max, draft.version), 0) + 1;
     const base = generateFirstTouchDraft({
       companyName: lead.companyName,
+      contactPerson: lead.contactPerson,
+      industry: lead.industry,
       productSummary: lead.productSummary,
       potentialPlasticParts: lead.potentialPlasticParts,
       website: process.env.COMPANY_WEBSITE || "https://www.jincongplastic.com"
@@ -28,7 +30,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
         recipient: lead.publicEmail,
         subject: type === "FOLLOW_UP" ? `跟进：${base.subject}` : base.subject,
         body: type === "FOLLOW_UP" ? `${base.body}\n\n此前邮件如未转达，也烦请协助转交相关负责人；如无需联系，回复“无需联系”即可。` : base.body,
-        status: "DRAFT",
+        status: "PENDING_REVIEW",
         version: latestVersion,
         idempotencyKey: `${base.idempotencyKey}-${type}-${latestVersion}`
       }

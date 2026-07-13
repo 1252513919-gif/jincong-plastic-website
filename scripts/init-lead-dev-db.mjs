@@ -30,6 +30,10 @@ CREATE TABLE IF NOT EXISTS "Lead" (
   "lastResearchAt" DATETIME,
   "websiteSnapshot" TEXT,
   "lastContactedAt" DATETIME,
+  "followUpAt" DATETIME,
+  "followUpMethod" TEXT,
+  "followUpStatus" TEXT,
+  "followUpNote" TEXT,
   "repliedAt" DATETIME,
   "hasFollowedUp" BOOLEAN NOT NULL DEFAULT false,
   "doNotContactReason" TEXT,
@@ -115,26 +119,44 @@ CREATE UNIQUE INDEX IF NOT EXISTS "SuppressionList_type_value_key" ON "Suppressi
 db.prepare(`INSERT OR IGNORE INTO "SystemSetting" ("id", "testMode", "updatedAt") VALUES ('lead-dev', true, CURRENT_TIMESTAMP)`).run();
 
 const leads = [
-  ["河北恒驰自行车零件集团有限公司", "河北邢台", "童车/自行车零件", "童车、儿童自行车及相关零部件"],
-  ["河北贝儿佳儿童用品有限公司", "河北邢台", "儿童用品", "儿童车、婴童用品及塑料配件"],
-  ["河北红思达车业有限公司", "河北邢台", "车业", "童车、自行车及车用配件"],
-  ["河北库比车业有限公司", "河北邢台", "车业", "儿童车、滑步车及车架配件"],
-  ["河北盛马电子科技有限公司", "河北", "电子电气", "电子电气产品、外壳及固定配件"],
-  ["河北蓝鸟家具股份有限公司", "河北邢台", "家具", "办公家具、家具结构件及配套五金塑料件"],
-  ["荣喜宠物食品有限公司", "河北", "宠物用品", "宠物食品及宠物用品配套件"],
-  ["邢台诺德宠物用品有限公司", "河北邢台", "宠物用品", "宠物用品、宠物出行及喂养相关产品"],
-  ["河北酷贝宠物用品有限公司", "河北", "宠物用品", "宠物用品及相关塑料结构件"],
-  ["清河县利国汽车配件有限公司", "河北邢台", "汽车配件", "汽车配件、卡扣、堵盖及橡塑配件"]
+  ["lead-hebei-hengchi-bicycle-parts", "河北恒驰自行车零件集团有限公司", "河北邢台", "童车/自行车零件", "童车、儿童自行车及相关零部件"],
+  ["lead-hebei-beierjia-child-products", "河北贝儿佳儿童用品有限公司", "河北邢台", "儿童用品", "儿童车、婴童用品及塑料配件"],
+  ["lead-hebei-hongsida-vehicles", "河北红思达车业有限公司", "河北邢台", "车业", "童车、自行车及车用配件"],
+  ["lead-hebei-kubi-vehicles", "河北库比车业有限公司", "河北邢台", "车业", "儿童车、滑步车及车架配件"],
+  ["lead-hebei-shengma-electronics", "河北盛马电子科技有限公司", "河北", "电子电气", "电子电气产品、外壳及固定配件"],
+  ["lead-hebei-lanniao-furniture", "河北蓝鸟家具股份有限公司", "河北邢台", "家具", "办公家具、家具结构件及配套五金塑料件"],
+  ["lead-rongxi-pet-food", "荣喜宠物食品有限公司", "河北", "宠物用品", "宠物食品及宠物用品配套件"],
+  ["lead-xingtai-nuode-pet-products", "邢台诺德宠物用品有限公司", "河北邢台", "宠物用品", "宠物用品、宠物出行及喂养相关产品"],
+  ["lead-hebei-kubei-pet-products", "河北酷贝宠物用品有限公司", "河北", "宠物用品", "宠物用品及相关塑料结构件"],
+  ["lead-qinghe-liguo-auto-parts", "清河县利国汽车配件有限公司", "河北邢台", "汽车配件", "汽车配件、卡扣、堵盖及橡塑配件"]
 ];
 
 const insertLead = db.prepare(`
-INSERT OR IGNORE INTO "Lead"
+INSERT INTO "Lead"
 ("id", "companyName", "region", "industry", "productSummary", "priority", "contactVerificationStatus", "notes", "updatedAt")
 VALUES (?, ?, ?, ?, ?, 'MEDIUM', 'UNVERIFIED', '首批内置客户。发送前必须重新访问官网或公开来源验证联系方式。', CURRENT_TIMESTAMP)
+ON CONFLICT("id") DO UPDATE SET
+  "companyName" = excluded."companyName",
+  "region" = excluded."region",
+  "industry" = excluded."industry",
+  "productSummary" = excluded."productSummary",
+  "updatedAt" = CURRENT_TIMESTAMP
 `);
 
+const renameLead = db.prepare(`UPDATE "Lead" SET "id" = ? WHERE "id" = ?`);
+const renameDraft = db.prepare(`UPDATE "EmailDraft" SET "leadId" = ? WHERE "leadId" = ?`);
+const renameLog = db.prepare(`UPDATE "EmailLog" SET "leadId" = ? WHERE "leadId" = ?`);
+const renameSuppression = db.prepare(`UPDATE "SuppressionList" SET "sourceLeadId" = ? WHERE "sourceLeadId" = ?`);
+
+for (const [id, companyName] of leads) {
+  renameDraft.run(id, companyName);
+  renameLog.run(id, companyName);
+  renameSuppression.run(id, companyName);
+  renameLead.run(id, companyName);
+}
+
 for (const lead of leads) {
-  insertLead.run(lead[0], lead[0], lead[1], lead[2], lead[3]);
+  insertLead.run(...lead);
 }
 
 db.close();

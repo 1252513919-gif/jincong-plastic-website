@@ -3,7 +3,7 @@ import { getEmailDomain, isValidEmail } from "@/features/lead-dev/lib/email-vali
 import { jsonError, withLeadDevApi } from "@/features/lead-dev/lib/api";
 import { prisma } from "@/features/lead-dev/lib/prisma";
 import { sendLeadDevMail } from "@/features/lead-dev/lib/send-mail";
-import { isWithinSendingWindow } from "@/features/lead-dev/lib/sending-rules";
+import { addWorkingDays, isWithinSendingWindow } from "@/features/lead-dev/lib/sending-rules";
 
 export const runtime = "nodejs";
 
@@ -48,12 +48,18 @@ export async function POST() {
     });
     if (suppressed) return jsonError("该邮箱或域名在拒绝联系名单中");
 
+    const testModeEnabled = process.env.TEST_MODE !== "false";
     const previousSent = await prisma.emailLog.findFirst({
-      where: {
-        status: "SENT",
-        intendedRecipient: draft.recipient,
-        type: draft.type
-      }
+      where: testModeEnabled
+        ? {
+            status: "SENT",
+            draftId: draft.id
+          }
+        : {
+            status: "SENT",
+            intendedRecipient: draft.recipient,
+            type: draft.type
+          }
     });
     if (previousSent) return jsonError("该邮箱同类型邮件已发送过，禁止重复发送");
 
@@ -96,6 +102,14 @@ export async function POST() {
           data: {
             status: "CONTACTED",
             lastContactedAt: now,
+            ...(draft.type === EmailDraftType.FIRST_TOUCH
+              ? {
+                  followUpAt: addWorkingDays(now, 3),
+                  followUpMethod: "邮件",
+                  followUpStatus: "待跟进",
+                  followUpNote: "首封邮件已发送，等待客户回复；如无回复按计划跟进。"
+                }
+              : {}),
             ...(draft.type === EmailDraftType.FOLLOW_UP ? { hasFollowedUp: true } : {})
           }
         }),

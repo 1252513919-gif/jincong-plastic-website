@@ -8,9 +8,17 @@ export async function middleware(request: NextRequest) {
   const isLeadDevApi = pathname.startsWith("/api/lead-dev/");
 
   if (!isLeadDevPage && !isLeadDevApi) return NextResponse.next();
-  if (pathname === "/lead-dev/login" || pathname === "/api/lead-dev/auth/login") return NextResponse.next();
+  if (pathname === "/api/lead-dev/auth/login") return NextResponse.next();
 
   const valid = await verifySession(request.cookies.get(cookieName)?.value);
+  if (pathname === "/lead-dev/login") {
+    if (!valid) return NextResponse.next();
+    const dashboardUrl = request.nextUrl.clone();
+    dashboardUrl.pathname = "/lead-dev";
+    dashboardUrl.search = "";
+    return NextResponse.redirect(dashboardUrl);
+  }
+
   if (valid) return NextResponse.next();
 
   if (isLeadDevApi) {

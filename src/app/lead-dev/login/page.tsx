@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { LeadDevLoginForm } from "@/features/lead-dev/components/LeadDevLoginForm";
+import { getLeadDevSession } from "@/features/lead-dev/lib/auth";
 
 export const metadata: Metadata = {
   title: "客户开发后台登录",
   robots: { index: false, follow: false }
 };
 
-export default function LeadDevLoginPage() {
+export default async function LeadDevLoginPage() {
+  const session = await getLeadDevSession();
+  if (session) {
+    redirect("/lead-dev");
+  }
+
   return (
     <section className="min-h-[70vh] bg-slate-50 px-6 py-24">
       <div className="mx-auto max-w-md rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
