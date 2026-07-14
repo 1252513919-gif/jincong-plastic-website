@@ -76,6 +76,19 @@ CREATE TABLE IF NOT EXISTS "EmailLog" (
   CONSTRAINT "EmailLog_leadId_fkey" FOREIGN KEY ("leadId") REFERENCES "Lead" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT "EmailLog_draftId_fkey" FOREIGN KEY ("draftId") REFERENCES "EmailDraft" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
+CREATE TABLE IF NOT EXISTS "FollowUpRecord" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "leadId" TEXT NOT NULL,
+  "method" TEXT NOT NULL,
+  "status" TEXT NOT NULL DEFAULT 'PLANNED',
+  "scheduledAt" DATETIME,
+  "completedAt" DATETIME,
+  "note" TEXT,
+  "nextAction" TEXT,
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "FollowUpRecord_leadId_fkey" FOREIGN KEY ("leadId") REFERENCES "Lead" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
 CREATE TABLE IF NOT EXISTS "SuppressionList" (
   "id" TEXT NOT NULL PRIMARY KEY,
   "type" TEXT NOT NULL,
@@ -112,6 +125,10 @@ CREATE UNIQUE INDEX IF NOT EXISTS "EmailLog_idempotencyKey_key" ON "EmailLog"("i
 CREATE INDEX IF NOT EXISTS "EmailLog_leadId_idx" ON "EmailLog"("leadId");
 CREATE INDEX IF NOT EXISTS "EmailLog_draftId_idx" ON "EmailLog"("draftId");
 CREATE INDEX IF NOT EXISTS "EmailLog_createdAt_idx" ON "EmailLog"("createdAt");
+CREATE INDEX IF NOT EXISTS "FollowUpRecord_leadId_idx" ON "FollowUpRecord"("leadId");
+CREATE INDEX IF NOT EXISTS "FollowUpRecord_status_idx" ON "FollowUpRecord"("status");
+CREATE INDEX IF NOT EXISTS "FollowUpRecord_scheduledAt_idx" ON "FollowUpRecord"("scheduledAt");
+CREATE INDEX IF NOT EXISTS "FollowUpRecord_createdAt_idx" ON "FollowUpRecord"("createdAt");
 CREATE INDEX IF NOT EXISTS "SuppressionList_value_idx" ON "SuppressionList"("value");
 CREATE UNIQUE INDEX IF NOT EXISTS "SuppressionList_type_value_key" ON "SuppressionList"("type", "value");
 `);

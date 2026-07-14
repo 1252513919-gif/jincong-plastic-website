@@ -2,6 +2,16 @@
 
 import { useState } from "react";
 
+type FollowUpRecordPayload = {
+  id: string;
+  method: string;
+  status: string;
+  scheduledAt?: string | null;
+  completedAt?: string | null;
+  note?: string | null;
+  nextAction?: string | null;
+};
+
 type LeadPayload = {
   id: string;
   companyName: string;
@@ -19,6 +29,7 @@ type LeadPayload = {
   personalizationReason?: string | null;
   notes?: string | null;
   drafts: Array<{ id: string; status: string; subject: string; body: string }>;
+  followUpRecords: FollowUpRecordPayload[];
 };
 
 export function LeadDetailActions({ lead }: { lead: LeadPayload }) {
@@ -45,6 +56,12 @@ export function LeadDetailActions({ lead }: { lead: LeadPayload }) {
   const latestPending = lead.drafts.find((draft) => ["DRAFT", "PENDING_REVIEW", "FAILED"].includes(draft.status));
   const [subject, setSubject] = useState(latestPending?.subject || "");
   const [body, setBody] = useState(latestPending?.body || "");
+  const [followUp, setFollowUp] = useState({
+    method: "EMAIL",
+    scheduledAt: "",
+    note: "",
+    nextAction: ""
+  });
 
   async function post(path: string, body: Record<string, unknown> = {}) {
     setMessage("");
@@ -58,9 +75,9 @@ export function LeadDetailActions({ lead }: { lead: LeadPayload }) {
     if (response.ok) window.location.reload();
   }
 
-  async function patchDraft(id: string, body: Record<string, unknown>) {
+  async function patch(path: string, body: Record<string, unknown>) {
     setMessage("");
-    const response = await fetch(`/api/lead-dev/drafts/${id}`, {
+    const response = await fetch(path, {
       method: "PATCH",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(body)
@@ -70,12 +87,32 @@ export function LeadDetailActions({ lead }: { lead: LeadPayload }) {
     if (response.ok) window.location.reload();
   }
 
+  async function patchDraft(id: string, body: Record<string, unknown>) {
+    await patch(`/api/lead-dev/drafts/${id}`, body);
+  }
+
+  function createFollowUp() {
+    return post(`/api/lead-dev/leads/${lead.id}/follow-ups`, followUp);
+  }
+
+  function completeFollowUp(id: string) {
+    return patch(`/api/lead-dev/follow-ups/${id}`, { action: "complete" });
+  }
+
+  function cancelFollowUp(id: string) {
+    return patch(`/api/lead-dev/follow-ups/${id}`, { action: "cancel" });
+  }
+
   function updateProfile(key: keyof typeof profile, value: string) {
     setProfile((current) => ({ ...current, [key]: value }));
   }
 
   function updateResearch(key: keyof typeof research, value: string) {
     setResearch((current) => ({ ...current, [key]: value }));
+  }
+
+  function updateFollowUp(key: keyof typeof followUp, value: string) {
+    setFollowUp((current) => ({ ...current, [key]: value }));
   }
 
   return (
@@ -109,7 +146,7 @@ export function LeadDetailActions({ lead }: { lead: LeadPayload }) {
       </div>
 
       <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="font-semibold text-slate-950">设置联系方式验证状态</h2>
+        <h2 className="font-semibold text-slate-950">状态与联系方式验证</h2>
         <label className="mt-3 block text-xs font-semibold text-slate-500">
           生命周期状态
           <select value={leadStatus} onChange={(event) => setLeadStatus(event.target.value)} className="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900">
@@ -142,7 +179,7 @@ export function LeadDetailActions({ lead }: { lead: LeadPayload }) {
             生成首封开发信
           </button>
           <button onClick={() => post(`/api/lead-dev/leads/${lead.id}/drafts`, { type: "FOLLOW_UP" })} className="rounded-full border border-slate-300 px-5 py-2 text-sm font-semibold">
-            创建下一次跟进记录
+            生成跟进邮件草稿
           </button>
         </div>
         {latestPending && (
@@ -158,6 +195,36 @@ export function LeadDetailActions({ lead }: { lead: LeadPayload }) {
       </div>
 
       <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="font-semibold text-slate-950">新建跟进任务</h2>
+        <label className="mt-3 block text-xs font-semibold text-slate-500">
+          跟进方式
+          <select value={followUp.method} onChange={(event) => updateFollowUp("method", event.target.value)} className="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900">
+            <option value="EMAIL">邮件</option>
+            <option value="PHONE">电话</option>
+            <option value="WECHAT">微信</option>
+            <option value="VISIT">拜访</option>
+            <option value="OTHER">其他</option>
+          </select>
+        </label>
+        <Input label="计划跟进时间" type="datetime-local" value={followUp.scheduledAt} onChange={(value) => updateFollowUp("scheduledAt", value)} />
+        <Textarea label="本次跟进备注" value={followUp.note} onChange={(value) => updateFollowUp("note", value)} />
+        <Textarea label="下一步计划" value={followUp.nextAction} onChange={(value) => updateFollowUp("nextAction", value)} />
+        <button onClick={createFollowUp} className="mt-4 rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold text-white">
+          创建跟进记录
+        </button>
+        <div className="mt-5 space-y-2">
+          {lead.followUpRecords.filter((record) => record.status === "PLANNED").map((record) => (
+            <div key={record.id} className="rounded-2xl bg-slate-50 p-3 text-sm text-slate-700">
+              <p className="font-semibold text-slate-950">{record.method} / {record.scheduledAt ? new Date(record.scheduledAt).toLocaleString("zh-CN") : "未设置时间"}</p>
+              {record.note && <p className="mt-1">{record.note}</p>}
+              <button onClick={() => completeFollowUp(record.id)} className="mt-2 rounded-full bg-emerald-700 px-4 py-2 text-xs font-semibold text-white">标记完成</button>
+              <button onClick={() => cancelFollowUp(record.id)} className="ml-2 mt-2 rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold">取消任务</button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="font-semibold text-slate-950">停止联系</h2>
         <button onClick={() => post(`/api/lead-dev/leads/${lead.id}`, { action: "doNotContact" })} className="mt-3 rounded-full border border-red-200 px-5 py-2 text-sm font-semibold text-red-700">
           设为不再联系
@@ -168,11 +235,11 @@ export function LeadDetailActions({ lead }: { lead: LeadPayload }) {
   );
 }
 
-function Input({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+function Input({ label, value, onChange, type = "text" }: { label: string; value: string; onChange: (value: string) => void; type?: string }) {
   return (
     <label className="block text-xs font-semibold text-slate-500">
       {label}
-      <input value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900" />
+      <input type={type} value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900" />
     </label>
   );
 }

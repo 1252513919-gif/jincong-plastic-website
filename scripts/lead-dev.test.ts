@@ -226,8 +226,73 @@ test("sent leads can carry a three-working-day follow-up task visible in detail 
   assert.match(schema, /followUpNote\s+String\?/);
   assert.match(detail, /followUpAt/);
   assert.match(detail, /\u8ddf\u8fdb\u4efb\u52a1/);
-  assert.match(followUps, /followUpAt/);
+  assert.match(followUps, /scheduledAt/);
   assert.match(followUps, /\u5f85\u8ddf\u8fdb/);
+});
+
+test("follow-up records are modeled as independent lead history", () => {
+  const localSchema = readFileSync("prisma/schema.prisma", "utf8");
+  const postgresSchema = readFileSync("prisma/schema.postgres.prisma", "utf8");
+  const initDb = readFileSync("scripts/init-lead-dev-db.mjs", "utf8");
+
+  for (const source of [localSchema, postgresSchema]) {
+    assert.match(source, /model FollowUpRecord/);
+    assert.match(source, /leadId\s+String/);
+    assert.match(source, /method\s+FollowUpMethod/);
+    assert.match(source, /status\s+FollowUpRecordStatus\s+@default\(PLANNED\)/);
+    assert.match(source, /scheduledAt\s+DateTime\?/);
+    assert.match(source, /completedAt\s+DateTime\?/);
+    assert.match(source, /note\s+String\?/);
+    assert.match(source, /nextAction\s+String\?/);
+    assert.match(source, /@@index\(\[leadId\]\)/);
+    assert.match(source, /@@index\(\[status\]\)/);
+    assert.match(source, /@@index\(\[scheduledAt\]\)/);
+    assert.match(source, /@@index\(\[createdAt\]\)/);
+  }
+
+  assert.match(localSchema, /followUpRecords\s+FollowUpRecord\[\]/);
+  assert.match(initDb, /CREATE TABLE IF NOT EXISTS "FollowUpRecord"/);
+  assert.match(initDb, /FollowUpRecord_leadId_idx/);
+});
+
+test("follow-up APIs create independent records and synchronize lead summary fields", () => {
+  const createRoute = readFileSync("src/app/api/lead-dev/leads/[id]/follow-ups/route.ts", "utf8");
+  const updateRoute = readFileSync("src/app/api/lead-dev/follow-ups/[id]/route.ts", "utf8");
+  const middleware = readFileSync("src/middleware.ts", "utf8");
+
+  assert.match(createRoute, /withLeadDevApi/);
+  assert.match(createRoute, /followUpRecord\.create/);
+  assert.match(createRoute, /followUpAt/);
+  assert.match(createRoute, /followUpStatus/);
+  assert.match(createRoute, /followUpNote/);
+  assert.doesNotMatch(createRoute, /sendLeadDevMail|nodemailer|sendMail/);
+
+  assert.match(updateRoute, /withLeadDevApi/);
+  assert.match(updateRoute, /followUpRecord\.update/);
+  assert.match(updateRoute, /COMPLETED/);
+  assert.match(updateRoute, /completedAt/);
+  assert.match(updateRoute, /lastContactedAt/);
+  assert.match(updateRoute, /hasFollowedUp/);
+  assert.match(updateRoute, /CANCELLED/);
+  assert.doesNotMatch(updateRoute, /sendLeadDevMail|nodemailer|sendMail/);
+
+  assert.match(middleware, /\/api\/lead-dev\/:path\*/);
+});
+
+test("follow-up pages render history, statuses, and do not rely only on lead summary fields", () => {
+  const detail = readFileSync("src/app/lead-dev/leads/[id]/page.tsx", "utf8");
+  const actions = readFileSync("src/features/lead-dev/components/LeadDetailActions.tsx", "utf8");
+  const center = readFileSync("src/app/lead-dev/follow-ups/page.tsx", "utf8");
+
+  assert.match(detail, /followUpRecords/);
+  assert.match(detail, /\u8ddf\u8fdb\u5386\u53f2/);
+  assert.match(actions, /createFollowUp/);
+  assert.match(actions, /completeFollowUp/);
+  assert.match(actions, /cancelFollowUp/);
+  assert.match(center, /followUpRecord\.findMany/);
+  for (const text of ["待跟进", "已完成", "已取消", "已逾期"]) {
+    assert.match(center, new RegExp(text));
+  }
 });
 
 test("queue page shows pending review drafts with review controls and safe test mode copy", () => {
@@ -287,20 +352,32 @@ test("test mode duplicate protection is draft-specific because all tests use TES
 test("production postgres schema is prepared without replacing local sqlite schema", () => {
   const localSchema = readFileSync("prisma/schema.prisma", "utf8");
   const postgresSchema = readFileSync("prisma/schema.postgres.prisma", "utf8");
+  const packageJson = readFileSync("package.json", "utf8");
+  const generator = readFileSync("scripts/generate-prisma-client.mjs", "utf8");
 
   assert.match(localSchema, /provider\s+=\s+"sqlite"/);
   assert.match(postgresSchema, /provider\s+=\s+"postgresql"/);
+  assert.match(postgresSchema, /env\("DATABASE_URL_UNPOOLED"\)/);
   assert.match(postgresSchema, /followUpAt\s+DateTime\?/);
   assert.match(postgresSchema, /@@unique\(\[leadId, type, version\]\)/);
   assert.match(postgresSchema, /idempotencyKey\s+String\s+@unique/);
+  assert.match(packageJson, /"postinstall":\s*"node scripts\/generate-prisma-client\.mjs"/);
+  assert.match(generator, /DATABASE_URL_UNPOOLED/);
+  assert.match(generator, /schema\.postgres\.prisma/);
+  assert.doesNotMatch(generator, /console\.log|SMTP_PASS|LEAD_DEV_SESSION_SECRET|postgresql:\/\/|mysql:\/\//);
 });
 
 test("sqlite to postgres migration script preserves ids and prevents duplicate imports", () => {
   const source = readFileSync("scripts/migrate-lead-dev-sqlite-to-postgres.ts", "utf8");
 
-  assert.match(source, /POSTGRES_DATABASE_URL/);
+  assert.match(source, /DATABASE_URL_UNPOOLED/);
+  assert.match(source, /process\.env\.DATABASE_URL_UNPOOLED\s+\|\|\s+process\.env\.DATABASE_URL/);
+  assert.doesNotMatch(source, /POSTGRES_DATABASE_URL/);
   assert.match(source, /ON CONFLICT \("id"\) DO UPDATE/);
   assert.match(source, /ON CONFLICT \("idempotencyKey"\) DO UPDATE/);
+  assert.match(source, /FollowUpRecord/);
+  assert.match(source, /legacy-follow-up/);
+  assert.match(source, /FollowUpRecord/);
   assert.match(source, /assertPostgresUrl/);
   assert.match(source, /followUpAt/);
 });
@@ -310,6 +387,7 @@ test("production environment example stays safe and keeps TEST_MODE true", () =>
 
   for (const key of [
     "DATABASE_URL",
+    "DATABASE_URL_UNPOOLED",
     "TEST_MODE=true",
     "TEST_RECIPIENT=",
     "SMTP_HOST=",

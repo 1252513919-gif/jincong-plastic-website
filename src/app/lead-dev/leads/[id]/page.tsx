@@ -12,7 +12,8 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
     where: { id },
     include: {
       drafts: { orderBy: { createdAt: "desc" } },
-      logs: { orderBy: { createdAt: "desc" }, take: 20 }
+      logs: { orderBy: { createdAt: "desc" }, take: 20 },
+      followUpRecords: { orderBy: [{ scheduledAt: "desc" }, { createdAt: "desc" }] }
     }
   });
 
@@ -22,9 +23,7 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
         <div className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-700">Lead Detail</p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">未找到该客户</h1>
-          <p className="mt-3 text-sm leading-6 text-slate-600">
-            当前客户 ID 在本地客户开发数据库中不存在，可能已被删除，或列表链接不是稳定客户 ID。
-          </p>
+          <p className="mt-3 text-sm leading-6 text-slate-600">当前客户 ID 在本地客户开发数据库中不存在，可能已被删除，或列表链接不是稳定客户 ID。</p>
           <Link href="/lead-dev/leads" className="mt-6 inline-flex rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white">
             返回客户列表
           </Link>
@@ -105,19 +104,36 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="text-xl font-semibold text-slate-950">跟进记录</h2>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
-                <Info label="上次联系时间" value={lead.lastContactedAt ? lead.lastContactedAt.toLocaleString("zh-CN") : null} />
-                <Info label="是否已生成跟进" value={lead.hasFollowedUp ? "是" : "否"} />
-                <Info label="回复时间" value={lead.repliedAt ? lead.repliedAt.toLocaleString("zh-CN") : null} />
-                <Info label="跟进任务" value={lead.followUpAt ? `${lead.followUpMethod || "邮件"} / ${lead.followUpStatus || "待跟进"} / ${lead.followUpAt.toLocaleString("zh-CN")}` : null} />
-                <Info label="跟进备注" value={lead.followUpNote} large />
+                <Info label="上次联系时间" value={formatDate(lead.lastContactedAt)} />
+                <Info label="是否已跟进" value={lead.hasFollowedUp ? "是" : "否"} />
+                <Info label="回复时间" value={formatDate(lead.repliedAt)} />
+                <Info label="当前跟进任务" value={lead.followUpAt ? `${lead.followUpMethod || "邮件"} / ${lead.followUpStatus || "待跟进"} / ${formatDate(lead.followUpAt)}` : null} />
+                <Info label="当前跟进备注" value={lead.followUpNote} large />
               </div>
-              <div className="mt-4 space-y-3">
-                {lead.logs.map((log) => (
-                  <div key={log.id} className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">
-                    {log.status} / intended: {log.intendedRecipient} / actual: {log.actualRecipient} / {log.createdAt.toLocaleString("zh-CN")}
+              <div className="mt-6 space-y-3">
+                <h3 className="text-sm font-semibold text-slate-950">跟进历史</h3>
+                {lead.followUpRecords.map((record) => (
+                  <div key={record.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="font-semibold text-slate-950">{methodLabel(record.method)} / {statusLabel(record.status)}</span>
+                      <span className="text-xs text-slate-500">创建：{formatDate(record.createdAt)}</span>
+                    </div>
+                    <p className="mt-2">计划时间：{formatDate(record.scheduledAt) || "-"}</p>
+                    <p>完成时间：{formatDate(record.completedAt) || "-"}</p>
+                    {record.note && <p className="mt-2 whitespace-pre-wrap">备注：{record.note}</p>}
+                    {record.nextAction && <p className="mt-1 whitespace-pre-wrap">下一步：{record.nextAction}</p>}
                   </div>
                 ))}
-                {lead.logs.length === 0 && <p className="text-sm text-slate-500">暂无发送或跟进日志。</p>}
+                {lead.followUpRecords.length === 0 && <p className="text-sm text-slate-500">暂无独立跟进历史。</p>}
+              </div>
+              <div className="mt-6 space-y-3">
+                <h3 className="text-sm font-semibold text-slate-950">发送日志</h3>
+                {lead.logs.map((log) => (
+                  <div key={log.id} className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">
+                    {log.status} / intended: {log.intendedRecipient} / actual: {log.actualRecipient} / {formatDate(log.createdAt)}
+                  </div>
+                ))}
+                {lead.logs.length === 0 && <p className="text-sm text-slate-500">暂无发送日志。</p>}
               </div>
             </div>
           </div>
@@ -139,4 +155,17 @@ function Info({ label, value, large }: { label: string; value?: string | null; l
       <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{value || "-"}</p>
     </div>
   );
+}
+
+function formatDate(value?: Date | string | null) {
+  if (!value) return null;
+  return new Date(value).toLocaleString("zh-CN");
+}
+
+function methodLabel(value: string) {
+  return { EMAIL: "邮件", PHONE: "电话", WECHAT: "微信", VISIT: "拜访", OTHER: "其他" }[value] || value;
+}
+
+function statusLabel(value: string) {
+  return { PLANNED: "待跟进", COMPLETED: "已完成", CANCELLED: "已取消" }[value] || value;
 }

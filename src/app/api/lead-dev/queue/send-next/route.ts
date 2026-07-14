@@ -19,7 +19,7 @@ export async function POST() {
     if (setting.stopAllSending) return jsonError("已开启停止全部发送");
     if (setting.paused) return jsonError("发送已暂停");
     if (!isWithinSendingWindow(now, setting.timezone)) return jsonError("当前不在允许发送时间：周一至周五 09:00-17:30");
-    if (setting.nextAllowedSendAt && now < setting.nextAllowedSendAt) return jsonError(`发送间隔未到，下次允许时间：${setting.nextAllowedSendAt.toLocaleString("zh-CN")}`);
+    if (setting.nextAllowedSendAt && now < setting.nextAllowedSendAt) return jsonError(`发送间隔未到，下一次允许时间：${setting.nextAllowedSendAt.toLocaleString("zh-CN")}`);
 
     const sentToday = await prisma.emailLog.count({
       where: { status: "SENT", createdAt: { gte: startOfToday() } }
@@ -76,6 +76,7 @@ export async function POST() {
         body: draft.body
       });
       const nextAllowedSendAt = minutesFromNow(randomInt(setting.minSendIntervalMinutes, setting.maxSendIntervalMinutes));
+      const nextFollowUpAt = addWorkingDays(now, 3);
       await prisma.$transaction([
         prisma.emailDraft.update({
           where: { id: draft.id },
@@ -104,7 +105,7 @@ export async function POST() {
             lastContactedAt: now,
             ...(draft.type === EmailDraftType.FIRST_TOUCH
               ? {
-                  followUpAt: addWorkingDays(now, 3),
+                  followUpAt: nextFollowUpAt,
                   followUpMethod: "邮件",
                   followUpStatus: "待跟进",
                   followUpNote: "首封邮件已发送，等待客户回复；如无回复按计划跟进。"
@@ -113,6 +114,20 @@ export async function POST() {
             ...(draft.type === EmailDraftType.FOLLOW_UP ? { hasFollowedUp: true } : {})
           }
         }),
+        ...(draft.type === EmailDraftType.FIRST_TOUCH
+          ? [
+              prisma.followUpRecord.create({
+                data: {
+                  leadId: draft.leadId,
+                  method: "EMAIL",
+                  status: "PLANNED",
+                  scheduledAt: nextFollowUpAt,
+                  note: "首封邮件已发送，等待客户回复；如无回复按计划跟进。",
+                  nextAction: "第 3 个工作日检查是否需要继续沟通。"
+                }
+              })
+            ]
+          : []),
         prisma.systemSetting.update({
           where: { id: "lead-dev" },
           data: { lastSentAt: now, nextAllowedSendAt }

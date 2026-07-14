@@ -59,6 +59,20 @@ enum SuppressionReason {
   MANUAL
 }
 
+enum FollowUpMethod {
+  EMAIL
+  PHONE
+  WECHAT
+  VISIT
+  OTHER
+}
+
+enum FollowUpRecordStatus {
+  PLANNED
+  COMPLETED
+  CANCELLED
+}
+
 model Lead {
   id                        String                    @id @default(cuid())
   companyName               String
@@ -94,6 +108,7 @@ model Lead {
 
   drafts EmailDraft[]
   logs   EmailLog[]
+  followUpRecords FollowUpRecord[]
 
   @@index([companyName])
   @@index([publicEmail])
@@ -159,6 +174,25 @@ model SuppressionList {
 
   @@unique([type, value])
   @@index([value])
+}
+
+model FollowUpRecord {
+  id          String               @id @default(cuid())
+  leadId      String
+  lead        Lead                 @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  method      FollowUpMethod
+  status      FollowUpRecordStatus @default(PLANNED)
+  scheduledAt DateTime?
+  completedAt DateTime?
+  note        String?
+  nextAction  String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@index([leadId])
+  @@index([status])
+  @@index([scheduledAt])
+  @@index([createdAt])
 }
 
 model SystemSetting {

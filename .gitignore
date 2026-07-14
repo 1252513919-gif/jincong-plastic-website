@@ -9,12 +9,15 @@ work
 tsconfig.tsbuildinfo
 prisma/*.db
 prisma/*.db-journal
+prisma/neon-data*.sql
 .local-backups/
 local-backups/
 backup/
 backups/
 *.sqlite
 *.sqlite-journal
+scripts/generate-neon-data-migration-sql.ts
+scripts/split-neon-data-sql.ts
 
 .vercel
 .worktrees/
