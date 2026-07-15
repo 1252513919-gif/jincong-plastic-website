@@ -580,3 +580,50 @@ test("draft review only approves pending review drafts and blocks terminal statu
   assert.match(draftRoute, /approvedAt: new Date\(\)/);
   assert.match(sendNextRoute, /where: \{ status: "APPROVED" \}/);
 });
+
+test("lead dev uses an independent CRM shell instead of the public website shell", () => {
+  const rootLayout = readFileSync("src/app/layout.tsx", "utf8");
+  const appShell = readFileSync("src/components/AppShell.tsx", "utf8");
+  const leadLayout = readFileSync("src/app/lead-dev/layout.tsx", "utf8");
+  const crmShell = readFileSync("src/features/lead-dev/components/CrmShell.tsx", "utf8");
+
+  assert.match(rootLayout, /<AppShell>\{children\}<\/AppShell>/);
+  assert.match(appShell, /usePathname/);
+  assert.match(appShell, /pathname\.startsWith\("\/lead-dev"\)/);
+  assert.match(appShell, /<>\{children\}<\/>/);
+  assert.match(appShell, /<SiteHeader \/>/);
+  assert.match(appShell, /<Footer \/>/);
+  assert.match(leadLayout, /<CrmShell>\{children\}<\/CrmShell>/);
+  assert.match(leadLayout, /robots:\s*\{\s*index:\s*false,\s*follow:\s*false\s*\}/);
+  assert.match(crmShell, /CRM/);
+  assert.match(crmShell, /\/lead-dev\/leads/);
+  assert.match(crmShell, /\/lead-dev\/follow-ups/);
+  assert.match(crmShell, /\/lead-dev\/queue/);
+  assert.doesNotMatch(crmShell, /SiteHeader|Footer|SmoothScroll/);
+});
+
+test("CRM host redirects root and public host isolation is guarded before final cutover", () => {
+  const middleware = readFileSync("src/middleware.ts", "utf8");
+
+  assert.match(middleware, /crm\.jincongplastic\.com/);
+  assert.match(middleware, /pathname === "\/"/);
+  assert.match(middleware, /\/lead-dev\/login/);
+  assert.match(middleware, /CRM_HOST_ENFORCEMENT/);
+  assert.match(middleware, /www\.jincongplastic\.com/);
+  assert.match(middleware, /jincongplastic\.com/);
+  assert.match(middleware, /404/);
+  assert.match(middleware, /x-robots-tag/);
+  assert.match(middleware, /\/lead-dev\/:path\*/);
+  assert.match(middleware, /\/api\/lead-dev\/:path\*/);
+});
+
+test("CRM project has no scheduled sender or Vercel cron configuration", () => {
+  const packageJson = readFileSync("package.json", "utf8");
+  const sendNextRoute = readFileSync("src/app/api/lead-dev/queue/send-next/route.ts", "utf8");
+  const vercelConfig = readFileSync("vercel.json", "utf8");
+
+  assert.doesNotMatch(packageJson, /cron|schedule|worker:send/i);
+  assert.doesNotMatch(vercelConfig, /"crons"/i);
+  assert.match(sendNextRoute, /export async function POST/);
+  assert.doesNotMatch(sendNextRoute, /export async function GET/);
+});

@@ -1,10 +1,7 @@
 /* eslint-disable @next/next/no-page-custom-font */
 import type { Metadata } from "next";
 import "./globals.css";
-import { Footer } from "@/components/Footer";
-import { SiteHeader } from "@/components/SiteHeader";
-import { SmoothScroll } from "@/components/SmoothScroll";
-import { LanguageProvider } from "@/i18n/LanguageContext";
+import { AppShell } from "@/components/AppShell";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -45,12 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        <LanguageProvider>
-          <SmoothScroll />
-          <SiteHeader />
-          <main>{children}</main>
-          <Footer />
-        </LanguageProvider>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
