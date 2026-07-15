@@ -40,25 +40,45 @@ export function QueueActions() {
 export function QueueDraftActions({ draftId, status }: { draftId: string; status: string }) {
   const router = useRouter();
   const [message, setMessage] = useState("");
+  const [pendingAction, setPendingAction] = useState<"approve" | "reject" | null>(null);
 
   async function patch(action: "approve" | "reject") {
     setMessage("");
-    const response = await fetch(`/api/lead-dev/drafts/${draftId}`, {
-      method: "PATCH",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ action })
-    });
-    const payload = await response.json().catch(() => ({}));
-    setMessage(response.ok ? payload.message || "操作完成" : payload.error || "操作失败");
-    if (response.ok) router.refresh();
+    setPendingAction(action);
+    try {
+      const response = await fetch(`/api/lead-dev/drafts/${draftId}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action })
+      });
+      const payload = await response.json().catch(() => ({}));
+      setMessage(response.ok ? payload.message || "操作完成" : payload.error || "操作失败");
+      if (response.ok) router.refresh();
+    } finally {
+      setPendingAction(null);
+    }
   }
 
   return (
     <div className="mt-4 flex flex-wrap items-center gap-3">
       {status === "PENDING_REVIEW" && (
         <>
-          <button onClick={() => patch("approve")} className="rounded-full bg-sky-700 px-5 py-2 text-sm font-semibold text-white">审核通过</button>
-          <button onClick={() => patch("reject")} className="rounded-full border border-red-200 px-5 py-2 text-sm font-semibold text-red-700">拒绝草稿</button>
+          <button
+            type="button"
+            disabled={pendingAction !== null}
+            onClick={() => patch("approve")}
+            className="rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold !text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-500 disabled:opacity-60 disabled:!text-white"
+          >
+            {pendingAction === "approve" ? "审核中..." : "审核通过"}
+          </button>
+          <button
+            type="button"
+            disabled={pendingAction !== null}
+            onClick={() => patch("reject")}
+            className="rounded-full border border-red-200 px-5 py-2 text-sm font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {pendingAction === "reject" ? "处理中..." : "拒绝草稿"}
+          </button>
         </>
       )}
       {status === "APPROVED" && <span className="rounded-full bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-700">已批准，等待单封发送</span>}

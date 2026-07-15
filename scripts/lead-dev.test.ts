@@ -498,6 +498,18 @@ test("queue draft review refreshes state without sending mail", () => {
   assert.doesNotMatch(draftRoute, /sendLeadDevMail|emailLog\.create/);
 });
 
+test("pending review approve button has visible text and clear states", () => {
+  const source = readFileSync("src/features/lead-dev/components/QueueActions.tsx", "utf8");
+
+  assert.match(source, /审核通过/);
+  assert.match(source, /bg-slate-950/);
+  assert.match(source, /!text-white/);
+  assert.match(source, /hover:bg-slate-800/);
+  assert.match(source, /disabled:cursor-not-allowed/);
+  assert.match(source, /disabled:opacity-60/);
+  assert.match(source, /pendingAction === "approve"/);
+});
+
 test("draft review only approves pending review drafts and blocks terminal statuses", () => {
   const draftRoute = readFileSync("src/app/api/lead-dev/drafts/[id]/route.ts", "utf8");
   const sendNextRoute = readFileSync("src/app/api/lead-dev/queue/send-next/route.ts", "utf8");
