@@ -477,3 +477,34 @@ test("CSV commit keeps import result visible and refreshes lead list data", () =
   assert.match(source, /router\.refresh\(\)/);
   assert.doesNotMatch(source, /window\.location\.reload/);
 });
+
+test("draft body textarea is large enough for review editing", () => {
+  const source = readFileSync("src/features/lead-dev/components/LeadDetailActions.tsx", "utf8");
+
+  assert.match(source, /min-h-\[320px\]/);
+  assert.match(source, /md:min-h-\[420px\]/);
+  assert.match(source, /w-full/);
+  assert.match(source, /resize-y/);
+});
+
+test("queue draft review refreshes state without sending mail", () => {
+  const queueActions = readFileSync("src/features/lead-dev/components/QueueActions.tsx", "utf8");
+  const draftRoute = readFileSync("src/app/api/lead-dev/drafts/[id]/route.ts", "utf8");
+
+  assert.match(queueActions, /status === "PENDING_REVIEW"/);
+  assert.match(queueActions, /router\.refresh\(\)/);
+  assert.doesNotMatch(queueActions, /window\.location\.reload/);
+  assert.match(draftRoute, /withLeadDevApi/);
+  assert.doesNotMatch(draftRoute, /sendLeadDevMail|emailLog\.create/);
+});
+
+test("draft review only approves pending review drafts and blocks terminal statuses", () => {
+  const draftRoute = readFileSync("src/app/api/lead-dev/drafts/[id]/route.ts", "utf8");
+  const sendNextRoute = readFileSync("src/app/api/lead-dev/queue/send-next/route.ts", "utf8");
+
+  assert.match(draftRoute, /draft\.status !== "PENDING_REVIEW"/);
+  assert.match(draftRoute, /REVIEW_TERMINAL_STATUSES\.includes\(draft\.status\)/);
+  assert.doesNotMatch(draftRoute, /\["PENDING_REVIEW", "DRAFT", "FAILED"\]/);
+  assert.match(draftRoute, /approvedAt: new Date\(\)/);
+  assert.match(sendNextRoute, /where: \{ status: "APPROVED" \}/);
+});

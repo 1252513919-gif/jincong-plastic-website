@@ -1,8 +1,10 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function QueueActions() {
+  const router = useRouter();
   const [message, setMessage] = useState("");
 
   async function post(path: string, body: Record<string, unknown> = {}) {
@@ -14,7 +16,7 @@ export function QueueActions() {
     });
     const payload = await response.json().catch(() => ({}));
     setMessage(response.ok ? payload.message || "操作完成" : payload.error || "操作失败");
-    if (response.ok) window.location.reload();
+    if (response.ok) router.refresh();
   }
 
   return (
@@ -36,6 +38,7 @@ export function QueueActions() {
 }
 
 export function QueueDraftActions({ draftId, status }: { draftId: string; status: string }) {
+  const router = useRouter();
   const [message, setMessage] = useState("");
 
   async function patch(action: "approve" | "reject") {
@@ -47,7 +50,7 @@ export function QueueDraftActions({ draftId, status }: { draftId: string; status
     });
     const payload = await response.json().catch(() => ({}));
     setMessage(response.ok ? payload.message || "操作完成" : payload.error || "操作失败");
-    if (response.ok) window.location.reload();
+    if (response.ok) router.refresh();
   }
 
   return (

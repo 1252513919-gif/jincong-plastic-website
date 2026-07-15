@@ -186,7 +186,7 @@ export function LeadDetailActions({ lead }: { lead: LeadPayload }) {
           <div className="mt-4 space-y-3">
             <p className="text-sm font-semibold text-slate-700">查看已有草稿并审核</p>
             <input value={subject} onChange={(event) => setSubject(event.target.value)} className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm" />
-            <textarea value={body} onChange={(event) => setBody(event.target.value)} className="h-64 w-full rounded-2xl border border-slate-200 p-4 text-sm leading-6" />
+            <textarea value={body} onChange={(event) => setBody(event.target.value)} className="min-h-[320px] w-full resize-y rounded-2xl border border-slate-200 p-4 text-sm leading-6 md:min-h-[420px]" />
             <button onClick={() => patchDraft(latestPending.id, { action: "submitReview", subject, body })} className="rounded-full border border-slate-300 px-5 py-2 text-sm font-semibold">提交待审核</button>
             <button onClick={() => patchDraft(latestPending.id, { action: "approve" })} className="ml-2 rounded-full bg-sky-700 px-5 py-2 text-sm font-semibold text-white">批准</button>
             <button onClick={() => patchDraft(latestPending.id, { action: "reject" })} className="ml-2 rounded-full border border-red-200 px-5 py-2 text-sm font-semibold text-red-700">拒绝</button>
