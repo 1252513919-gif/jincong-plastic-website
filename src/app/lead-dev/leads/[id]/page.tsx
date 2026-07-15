@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/features/lead-dev/lib/prisma";
 import { LeadDetailActions } from "@/features/lead-dev/components/LeadDetailActions";
 
+export const dynamic = "force-dynamic";
+
 type LeadDetailPageProps = {
   params: Promise<{ id: string }>;
 };

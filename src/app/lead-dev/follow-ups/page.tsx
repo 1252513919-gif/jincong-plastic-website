@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/features/lead-dev/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function FollowUpsPage() {
   const now = new Date();
   const records = await prisma.followUpRecord.findMany({

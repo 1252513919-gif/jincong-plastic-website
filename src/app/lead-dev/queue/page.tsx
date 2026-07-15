@@ -1,6 +1,8 @@
 import { prisma } from "@/features/lead-dev/lib/prisma";
 import { QueueActions, QueueDraftActions } from "@/features/lead-dev/components/QueueActions";
 
+export const dynamic = "force-dynamic";
+
 export default async function QueuePage() {
   const setting = await prisma.systemSetting.upsert({ where: { id: "lead-dev" }, update: {}, create: { id: "lead-dev", testMode: true } });
   const drafts = await prisma.emailDraft.findMany({

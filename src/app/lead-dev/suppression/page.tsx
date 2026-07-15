@@ -1,6 +1,8 @@
 import { prisma } from "@/features/lead-dev/lib/prisma";
 import { SuppressionForm } from "@/features/lead-dev/components/SuppressionForm";
 
+export const dynamic = "force-dynamic";
+
 export default async function SuppressionPage() {
   const rows = await prisma.suppressionList.findMany({ orderBy: { createdAt: "desc" } });
   return (

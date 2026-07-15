@@ -2,7 +2,16 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
-import { createSessionCookie, hashPassword, sessionCookieOptions, verifyPassword, verifySessionCookie } from "../src/features/lead-dev/lib/auth";
+import {
+  createSessionCookie,
+  getAdminPasswordHash,
+  getAdminUsername,
+  hashPassword,
+  hasAdminPasswordConfigured,
+  sessionCookieOptions,
+  verifyPassword,
+  verifySessionCookie
+} from "../src/features/lead-dev/lib/auth";
 import { parseLeadCsvPreview, sanitizeCsvCell } from "../src/features/lead-dev/lib/csv";
 import { generateFirstTouchDraft } from "../src/features/lead-dev/lib/draft-generator";
 import { isValidEmail, normalizeEmail } from "../src/features/lead-dev/lib/email-validation";
@@ -150,6 +159,28 @@ test("admin password hash verifies correct password and rejects wrong password",
   const hash = hashPassword("safe-password-123");
   assert.equal(await verifyPassword("safe-password-123", hash), true);
   assert.equal(await verifyPassword("wrong-password", hash), false);
+});
+
+test("admin credential environment values are normalized without trimming plaintext passwords", async () => {
+  const previousUsername = process.env.LEAD_DEV_ADMIN_USERNAME;
+  const previousHash = process.env.LEAD_DEV_ADMIN_PASSWORD_HASH;
+  const previousSecret = process.env.LEAD_DEV_SESSION_SECRET;
+  const password = "  safe-password-123  ";
+  const hash = hashPassword(password);
+
+  process.env.LEAD_DEV_ADMIN_USERNAME = `  "production-admin"  \n`;
+  process.env.LEAD_DEV_ADMIN_PASSWORD_HASH = `  '${hash}'  \n`;
+  process.env.LEAD_DEV_SESSION_SECRET = "  session-secret  ";
+
+  assert.equal(getAdminUsername(), "production-admin");
+  assert.equal(getAdminPasswordHash(), hash);
+  assert.equal(hasAdminPasswordConfigured(), true);
+  assert.equal(await verifyPassword(password, getAdminPasswordHash()), true);
+  assert.equal(await verifyPassword(password.trim(), getAdminPasswordHash()), false);
+
+  process.env.LEAD_DEV_ADMIN_USERNAME = previousUsername;
+  process.env.LEAD_DEV_ADMIN_PASSWORD_HASH = previousHash;
+  process.env.LEAD_DEV_SESSION_SECRET = previousSecret;
 });
 
 test("session cookie uses root path and is not secure in local development", () => {
@@ -364,6 +395,8 @@ test("production postgres schema is prepared without replacing local sqlite sche
   assert.match(packageJson, /"postinstall":\s*"node scripts\/generate-prisma-client\.mjs"/);
   assert.match(generator, /DATABASE_URL_UNPOOLED/);
   assert.match(generator, /schema\.postgres\.prisma/);
+  assert.match(generator, /shell:\s*process\.platform === "win32"/);
+  assert.match(generator, /result\.error\.name/);
   assert.doesNotMatch(generator, /console\.log|SMTP_PASS|LEAD_DEV_SESSION_SECRET|postgresql:\/\/|mysql:\/\//);
 });
 
@@ -413,6 +446,20 @@ test("lead dev health route exposes no secrets", () => {
   assert.match(source, /runtime = "nodejs"/);
   assert.match(source, /TEST_MODE/);
   assert.doesNotMatch(source, /SMTP_PASS|LEAD_DEV_SESSION_SECRET|DATABASE_URL|password/i);
+});
+
+test("lead dev database-backed pages are dynamic and not prerendered at build time", () => {
+  for (const file of [
+    "src/app/lead-dev/page.tsx",
+    "src/app/lead-dev/leads/page.tsx",
+    "src/app/lead-dev/leads/[id]/page.tsx",
+    "src/app/lead-dev/queue/page.tsx",
+    "src/app/lead-dev/follow-ups/page.tsx",
+    "src/app/lead-dev/suppression/page.tsx"
+  ]) {
+    const source = readFileSync(file, "utf8");
+    assert.match(source, /export const dynamic = "force-dynamic"/);
+  }
 });
 
 test("login api has server-side rate limiting and does not log credentials", () => {

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/features/lead-dev/lib/prisma";
 import { LeadImportPanel } from "@/features/lead-dev/components/LeadImportPanel";
 
+export const dynamic = "force-dynamic";
+
 export default async function LeadListPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;
   const q = params.q?.trim();

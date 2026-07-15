@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   createSessionCookie,
+  getAdminPasswordHash,
   getAdminUsername,
   hasAdminPasswordConfigured,
   sessionCookieOptions,
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
   }
 
   const expectedUser = getAdminUsername();
-  const expectedHash = process.env.LEAD_DEV_ADMIN_PASSWORD_HASH || "";
+  const expectedHash = getAdminPasswordHash();
   const valid = username === expectedUser && (await verifyPassword(password, expectedHash));
   if (!valid) {
     recordFailedLogin(rateLimitKey);

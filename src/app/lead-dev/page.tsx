@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/features/lead-dev/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function LeadDevDashboardPage() {
   const [total, pendingResearch, unverified, pendingReview, approved, sentToday, replied, bounced, suppressed] = await Promise.all([
     prisma.lead.count(),

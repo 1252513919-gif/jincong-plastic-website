@@ -61,11 +61,15 @@ export function unauthorizedJson() {
 }
 
 export function getAdminUsername() {
-  return process.env.LEAD_DEV_ADMIN_USERNAME || "admin";
+  return normalizeCredentialEnvValue(process.env.LEAD_DEV_ADMIN_USERNAME) || "admin";
+}
+
+export function getAdminPasswordHash() {
+  return normalizeCredentialEnvValue(process.env.LEAD_DEV_ADMIN_PASSWORD_HASH);
 }
 
 export function hasAdminPasswordConfigured() {
-  return Boolean(process.env.LEAD_DEV_ADMIN_PASSWORD_HASH && process.env.LEAD_DEV_SESSION_SECRET);
+  return Boolean(getAdminPasswordHash() && getSessionSecret({ throwIfMissing: false }));
 }
 
 export async function verifyPassword(password: string, encodedHash: string) {
@@ -99,12 +103,25 @@ export class LeadDevAuthError extends Error {
   }
 }
 
-function getSessionSecret() {
-  const secret = process.env.LEAD_DEV_SESSION_SECRET;
+function getSessionSecret(options: { throwIfMissing: boolean } = { throwIfMissing: true }) {
+  const secret = normalizeCredentialEnvValue(process.env.LEAD_DEV_SESSION_SECRET);
   if (!secret) {
+    if (!options.throwIfMissing) return "";
     throw new Error("LEAD_DEV_SESSION_SECRET is not configured");
   }
   return secret;
+}
+
+function normalizeCredentialEnvValue(value: string | undefined) {
+  const trimmed = value?.trim() ?? "";
+  if (trimmed.length >= 2) {
+    const first = trimmed[0];
+    const last = trimmed[trimmed.length - 1];
+    if ((first === `"` && last === `"`) || (first === "'" && last === "'")) {
+      return trimmed.slice(1, -1).trim();
+    }
+  }
+  return trimmed;
 }
 
 function sign(payload: string, secret: string) {
