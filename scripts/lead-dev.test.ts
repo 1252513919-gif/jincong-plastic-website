@@ -469,3 +469,11 @@ test("login api has server-side rate limiting and does not log credentials", () 
   assert.match(source, /recordFailedLogin/);
   assert.doesNotMatch(source, /console\.(log|error|warn)\([^)]*password/i);
 });
+
+test("CSV commit keeps import result visible and refreshes lead list data", () => {
+  const source = readFileSync("src/features/lead-dev/components/LeadImportPanel.tsx", "utf8");
+
+  assert.match(source, /useRouter/);
+  assert.match(source, /router\.refresh\(\)/);
+  assert.doesNotMatch(source, /window\.location\.reload/);
+});

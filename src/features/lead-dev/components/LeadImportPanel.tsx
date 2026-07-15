@@ -1,8 +1,10 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function LeadImportPanel() {
+  const router = useRouter();
   const [csv, setCsv] = useState("");
   const [preview, setPreview] = useState<Record<string, unknown> | null>(null);
   const [message, setMessage] = useState("");
@@ -25,8 +27,19 @@ export function LeadImportPanel() {
       body: JSON.stringify({ csv })
     });
     const payload = await response.json();
-    setMessage(response.ok ? `已导入 ${payload.created} 条，跳过 ${payload.skipped} 条` : payload.error || "导入失败");
-    if (response.ok) window.location.reload();
+    if (!response.ok) {
+      setMessage(payload.error || "导入失败");
+      return;
+    }
+
+    const created = Number(payload.created ?? 0);
+    const skipped = Number(payload.skipped ?? 0);
+    setMessage(
+      created > 0
+        ? `已导入 ${created} 条，跳过 ${skipped} 条。客户列表已刷新。`
+        : `没有新增记录，已跳过 ${skipped} 条。通常是公司名称、邮箱或官网与现有客户重复。`
+    );
+    router.refresh();
   }
 
   return (
