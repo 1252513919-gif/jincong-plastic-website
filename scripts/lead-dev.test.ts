@@ -15,6 +15,12 @@ import {
 import { parseLeadCsvPreview, sanitizeCsvCell } from "../src/features/lead-dev/lib/csv";
 import { generateFirstTouchDraft } from "../src/features/lead-dev/lib/draft-generator";
 import { isValidEmail, normalizeEmail } from "../src/features/lead-dev/lib/email-validation";
+import {
+  buildLeadNotes,
+  deriveContactStatus,
+  parseLeadNotes,
+  statusFromContactStatus
+} from "../src/features/lead-dev/lib/lead-metadata";
 import { canApproveDraft, isWithinSendingWindow } from "../src/features/lead-dev/lib/sending-rules";
 import { validateLeadDevMailConfig } from "../src/features/lead-dev/lib/send-mail";
 import { validatePublicResearchUrl } from "../src/features/lead-dev/lib/ssrf";
@@ -49,6 +55,60 @@ test("rejects CSV with unexpected columns", () => {
   const preview = parseLeadCsvPreview(csv);
   assert.equal(preview.validRows.length, 0);
   assert.match(preview.errors[0].message, /列名/);
+});
+
+test("lead CSV supports expanded lead pool fields", () => {
+  const csv = [
+    "companyName,region,industry,sourceType,website,sourceUrl,publicPhone,contactPerson,wechat,publicEmail,contactVerifiedAt,contactStatus,matchLevel,productCategory,notes",
+    "线索池测试,邢台,制造业,地图,https://example.com,https://example.com/contact,0319-0000000,采购部,wx-test,sales@example.com,2026-07-15,有意向,高,塑料件,备注"
+  ].join("\n");
+
+  const preview = parseLeadCsvPreview(csv);
+  assert.equal(preview.errors.length, 0);
+  assert.equal(preview.validRows.length, 1);
+  assert.equal(preview.validRows[0].sourceType, "地图");
+  assert.equal(preview.validRows[0].wechat, "wx-test");
+  assert.equal(preview.validRows[0].contactStatus, "有意向");
+  assert.equal(preview.validRows[0].matchLevel, "高");
+  assert.equal(preview.validRows[0].contactVerifiedAt, "2026-07-15");
+});
+
+test("lead metadata stores source, wechat, and contact status without losing notes", () => {
+  const notes = buildLeadNotes("人工备注", {
+    sourceType: "1688",
+    wechat: "wx-001",
+    contactStatus: "待联系"
+  });
+  const parsed = parseLeadNotes(notes);
+
+  assert.equal(parsed.visibleNotes, "人工备注");
+  assert.equal(parsed.metadata.sourceType, "1688");
+  assert.equal(parsed.metadata.wechat, "wx-001");
+  assert.equal(parsed.metadata.contactStatus, "待联系");
+  assert.equal(statusFromContactStatus("拒绝联系"), "DO_NOT_CONTACT");
+  assert.equal(deriveContactStatus("REPLIED", undefined), "已回复");
+});
+
+test("lead pool list supports source, contact status, and match level filters", () => {
+  const source = readFileSync("src/app/lead-dev/leads/page.tsx", "utf8");
+
+  assert.match(source, /name="industry"/);
+  assert.match(source, /name="region"/);
+  assert.match(source, /name="sourceType"/);
+  assert.match(source, /name="contactStatus"/);
+  assert.match(source, /name="matchLevel"/);
+  assert.match(source, /parseLeadNotes/);
+  assert.match(source, /deriveContactStatus/);
+});
+
+test("lead export includes expanded lead pool fields for external follow-up", () => {
+  const source = readFileSync("src/app/api/lead-dev/export/route.ts", "utf8");
+
+  for (const column of ["sourceType", "sourceUrl", "publicPhone", "contactPerson", "wechat", "publicEmail", "contactVerifiedAt", "contactStatus", "matchLevel"]) {
+    assert.match(source, new RegExp(`"${column}"`));
+  }
+  assert.match(source, /request\.nextUrl\.searchParams/);
+  assert.match(source, /parseLeadNotes/);
 });
 
 test("draft generation is conservative, Chinese, reviewed, and free of placeholders", () => {

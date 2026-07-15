@@ -1,2 +1,2 @@
-companyName,region,industry,website,publicEmail,publicPhone,contactPerson,sourceUrl,priority,productCategory,notes
-测试制造有限公司,河北邢台,电子电气,https://example.com,sales@example.com,0319-0000000,采购部,https://example.com/contact,MEDIUM,电子电气塑料件,导入前预览示例
+companyName,region,industry,sourceType,website,sourceUrl,publicPhone,contactPerson,wechat,publicEmail,contactVerifiedAt,contactStatus,matchLevel,productCategory,notes
+测试制造有限公司,河北邢台,电子电气,地图,https://example.com,https://example.com/contact,0319-0000000,采购部,wx-example,sales@example.com,2026-07-15,待联系,中,电子电气塑料件,导入前请先预览校验

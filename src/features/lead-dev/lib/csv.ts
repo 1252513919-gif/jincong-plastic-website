@@ -4,6 +4,24 @@ export const leadCsvColumns = [
   "companyName",
   "region",
   "industry",
+  "sourceType",
+  "website",
+  "sourceUrl",
+  "publicPhone",
+  "contactPerson",
+  "wechat",
+  "publicEmail",
+  "contactVerifiedAt",
+  "contactStatus",
+  "matchLevel",
+  "productCategory",
+  "notes"
+] as const;
+
+const legacyLeadCsvColumns = [
+  "companyName",
+  "region",
+  "industry",
   "website",
   "publicEmail",
   "publicPhone",
@@ -47,25 +65,30 @@ export function parseLeadCsvPreview(input: string): CsvPreviewResult {
   }
 
   const headers = splitCsvLine(lines[0]);
+  const headerText = headers.join(",");
   const expected = leadCsvColumns.join(",");
-  if (headers.join(",") !== expected) {
+  const legacyExpected = legacyLeadCsvColumns.join(",");
+  if (headerText !== expected && headerText !== legacyExpected) {
     return emptyWithError(`CSV 列名不匹配，必须为：${expected}`);
   }
 
+  const acceptedColumns = headerText === legacyExpected ? legacyLeadCsvColumns : leadCsvColumns;
   const result: CsvPreviewResult = { validRows: [], errors: [], duplicates: [], invalidEmails: [] };
   const seen = new Set<string>();
 
   lines.slice(1).forEach((line, index) => {
     const rowNumber = index + 2;
     const cells = splitCsvLine(line);
-    if (cells.length !== leadCsvColumns.length) {
+    if (cells.length !== acceptedColumns.length) {
       result.errors.push({ row: rowNumber, message: "列数不匹配" });
       return;
     }
 
-    const row = Object.fromEntries(
-      leadCsvColumns.map((column, cellIndex) => [column, sanitizeCsvCell(cells[cellIndex] ?? "")])
-    ) as LeadCsvRow;
+    const row = Object.fromEntries(leadCsvColumns.map((column) => [column, ""])) as LeadCsvRow;
+    acceptedColumns.forEach((column, cellIndex) => {
+      const nextColumn = column === "priority" ? "matchLevel" : column;
+      row[nextColumn as LeadCsvColumn] = sanitizeCsvCell(cells[cellIndex] ?? "");
+    });
 
     if (!row.companyName) {
       result.errors.push({ row: rowNumber, message: "companyName 不能为空" });

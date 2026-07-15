@@ -1,6 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import {
+  deriveContactStatus,
+  leadContactStatuses,
+  leadMatchLevels,
+  leadSourceTypes,
+  matchLevelFromPriority,
+  parseLeadNotes
+} from "@/features/lead-dev/lib/lead-metadata";
 
 type FollowUpRecordPayload = {
   id: string;
@@ -22,6 +30,8 @@ type LeadPayload = {
   publicPhone?: string | null;
   contactPerson?: string | null;
   sourceUrl?: string | null;
+  priority?: string | null;
+  contactVerifiedAt?: string | null;
   status: string;
   contactVerificationStatus: string;
   productSummary?: string | null;
@@ -33,22 +43,28 @@ type LeadPayload = {
 };
 
 export function LeadDetailActions({ lead }: { lead: LeadPayload }) {
+  const parsedNotes = parseLeadNotes(lead.notes);
   const [message, setMessage] = useState("");
   const [profile, setProfile] = useState({
     companyName: lead.companyName || "",
     region: lead.region || "",
     industry: lead.industry || "",
     website: lead.website || "",
+    sourceType: parsedNotes.metadata.sourceType || "",
+    sourceUrl: lead.sourceUrl || "",
     contactPerson: lead.contactPerson || "",
-    publicEmail: lead.publicEmail || "",
     publicPhone: lead.publicPhone || "",
-    sourceUrl: lead.sourceUrl || ""
+    wechat: parsedNotes.metadata.wechat || "",
+    publicEmail: lead.publicEmail || "",
+    contactVerifiedAt: formatDateInput(lead.contactVerifiedAt),
+    contactStatus: deriveContactStatus(lead.status, parsedNotes.metadata.contactStatus),
+    matchLevel: matchLevelFromPriority(lead.priority)
   });
   const [research, setResearch] = useState({
     productSummary: lead.productSummary || "",
     potentialPlasticParts: lead.potentialPlasticParts || "",
     personalizationReason: lead.personalizationReason || "",
-    notes: lead.notes || ""
+    notes: parsedNotes.visibleNotes || ""
   });
   const [contactSourceUrl, setContactSourceUrl] = useState(lead.sourceUrl || lead.website || "");
   const [leadStatus, setLeadStatus] = useState(lead.status);
@@ -124,10 +140,15 @@ export function LeadDetailActions({ lead }: { lead: LeadPayload }) {
           <Input label="行业" value={profile.industry} onChange={(value) => updateProfile("industry", value)} />
           <Input label="地区" value={profile.region} onChange={(value) => updateProfile("region", value)} />
           <Input label="官网" value={profile.website} onChange={(value) => updateProfile("website", value)} />
+          <Select label="客户来源" value={profile.sourceType} options={["", ...leadSourceTypes]} onChange={(value) => updateProfile("sourceType", value)} />
+          <Input label="来源网址" value={profile.sourceUrl} onChange={(value) => updateProfile("sourceUrl", value)} />
           <Input label="联系人" value={profile.contactPerson} onChange={(value) => updateProfile("contactPerson", value)} />
-          <Input label="邮箱" value={profile.publicEmail} onChange={(value) => updateProfile("publicEmail", value)} />
           <Input label="电话" value={profile.publicPhone} onChange={(value) => updateProfile("publicPhone", value)} />
-          <Input label="客户来源" value={profile.sourceUrl} onChange={(value) => updateProfile("sourceUrl", value)} />
+          <Input label="微信 / 企业微信" value={profile.wechat} onChange={(value) => updateProfile("wechat", value)} />
+          <Input label="邮箱" value={profile.publicEmail} onChange={(value) => updateProfile("publicEmail", value)} />
+          <Input label="最后核验时间" type="date" value={profile.contactVerifiedAt} onChange={(value) => updateProfile("contactVerifiedAt", value)} />
+          <Select label="联系状态" value={profile.contactStatus} options={leadContactStatuses} onChange={(value) => updateProfile("contactStatus", value)} />
+          <Select label="匹配等级" value={profile.matchLevel} options={leadMatchLevels} onChange={(value) => updateProfile("matchLevel", value)} />
         </div>
         <button onClick={() => post(`/api/lead-dev/leads/${lead.id}`, { action: "updateProfile", ...profile })} className="mt-4 rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold text-white">
           保存客户资料
@@ -244,6 +265,19 @@ function Input({ label, value, onChange, type = "text" }: { label: string; value
   );
 }
 
+function Select({ label, value, options, onChange }: { label: string; value: string; options: readonly string[]; onChange: (value: string) => void }) {
+  return (
+    <label className="block text-xs font-semibold text-slate-500">
+      {label}
+      <select value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900">
+        {options.map((option) => (
+          <option key={option} value={option}>{option || "未选择"}</option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 function Textarea({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
   return (
     <label className="mt-3 block text-xs font-semibold text-slate-500">
@@ -251,4 +285,11 @@ function Textarea({ label, value, onChange }: { label: string; value: string; on
       <textarea value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 h-24 w-full rounded-2xl border border-slate-200 p-3 text-sm leading-6 text-slate-900" />
     </label>
   );
+}
+
+function formatDateInput(value?: string | null) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString().slice(0, 10);
 }

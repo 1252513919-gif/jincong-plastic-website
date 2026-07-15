@@ -1,5 +1,13 @@
 import { getEmailDomain, isValidEmail, normalizeEmail } from "@/features/lead-dev/lib/email-validation";
 import { jsonError, withLeadDevApi } from "@/features/lead-dev/lib/api";
+import {
+  buildLeadNotes,
+  normalizeContactStatus,
+  normalizeSourceType,
+  parseLeadNotes,
+  priorityFromMatchLevel,
+  statusFromContactStatus
+} from "@/features/lead-dev/lib/lead-metadata";
 import { prisma } from "@/features/lead-dev/lib/prisma";
 
 type LeadActionPayload = {
@@ -11,9 +19,14 @@ type LeadActionPayload = {
   publicEmail?: string;
   publicPhone?: string;
   contactPerson?: string;
+  sourceType?: string;
   sourceUrl?: string;
+  wechat?: string;
   contactSourceUrl?: string;
   status?: string;
+  contactStatus?: string;
+  matchLevel?: string;
+  contactVerifiedAt?: string;
   contactVerificationStatus?: string;
   productSummary?: string;
   potentialPlasticParts?: string;
@@ -31,6 +44,9 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     if (payload?.action === "updateProfile") {
       const email = normalizeEmail(payload.publicEmail);
       if (email && !isValidEmail(email)) return jsonError("邮箱格式不正确");
+      const parsedNotes = parseLeadNotes(lead.notes);
+      const contactStatus = normalizeContactStatus(payload.contactStatus);
+
       await prisma.lead.update({
         where: { id },
         data: {
@@ -41,20 +57,30 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
           publicEmail: email || null,
           publicPhone: emptyToNull(payload.publicPhone),
           contactPerson: emptyToNull(payload.contactPerson),
-          sourceUrl: emptyToNull(payload.sourceUrl)
+          sourceUrl: emptyToNull(payload.sourceUrl),
+          priority: priorityFromMatchLevel(payload.matchLevel),
+          status: contactStatus ? statusFromContactStatus(contactStatus) : lead.status,
+          contactVerifiedAt: parseDateOrNull(payload.contactVerifiedAt),
+          notes: buildLeadNotes(parsedNotes.visibleNotes, {
+            ...parsedNotes.metadata,
+            sourceType: normalizeSourceType(payload.sourceType),
+            wechat: emptyToUndefined(payload.wechat),
+            contactStatus: contactStatus || parsedNotes.metadata.contactStatus
+          })
         }
       });
       return Response.json({ success: true, message: "客户资料已保存" });
     }
 
     if (payload?.action === "updateResearch") {
+      const parsedNotes = parseLeadNotes(lead.notes);
       await prisma.lead.update({
         where: { id },
         data: {
           productSummary: emptyToNull(payload.productSummary),
           potentialPlasticParts: emptyToNull(payload.potentialPlasticParts),
           personalizationReason: emptyToNull(payload.personalizationReason),
-          notes: emptyToNull(payload.notes),
+          notes: buildLeadNotes(payload.notes, parsedNotes.metadata),
           status: lead.status === "NEW" ? "RESEARCHED" : lead.status
         }
       });
@@ -134,4 +160,16 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 function emptyToNull(value: string | undefined) {
   const trimmed = value?.trim();
   return trimmed ? trimmed : null;
+}
+
+function emptyToUndefined(value: string | undefined) {
+  const trimmed = value?.trim();
+  return trimmed || undefined;
+}
+
+function parseDateOrNull(value: string | undefined) {
+  const trimmed = value?.trim();
+  if (!trimmed) return null;
+  const date = new Date(trimmed);
+  return Number.isNaN(date.getTime()) ? null : date;
 }

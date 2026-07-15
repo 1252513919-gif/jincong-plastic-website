@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/features/lead-dev/lib/prisma";
 import { LeadDetailActions } from "@/features/lead-dev/components/LeadDetailActions";
+import { deriveContactStatus, matchLevelFromPriority, parseLeadNotes } from "@/features/lead-dev/lib/lead-metadata";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,9 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
   }
 
   const safeLead = JSON.parse(JSON.stringify(lead));
+  const parsedNotes = parseLeadNotes(lead.notes);
+  const contactStatus = deriveContactStatus(lead.status, parsedNotes.metadata.contactStatus);
+  const matchLevel = matchLevelFromPriority(lead.priority);
 
   return (
     <section className="min-h-screen px-6 py-10">
@@ -62,11 +66,16 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
                 <Info label="行业" value={lead.industry} />
                 <Info label="地区" value={lead.region} />
                 <Info label="官网" value={lead.website} />
+                <Info label="客户来源" value={parsedNotes.metadata.sourceType || "未标注"} />
+                <Info label="来源网址" value={lead.sourceUrl} />
                 <Info label="联系人" value={lead.contactPerson} />
-                <Info label="邮箱" value={lead.publicEmail} />
                 <Info label="电话" value={lead.publicPhone} />
-                <Info label="客户来源" value={lead.sourceUrl} />
+                <Info label="微信 / 企业微信" value={parsedNotes.metadata.wechat} />
+                <Info label="邮箱" value={lead.publicEmail} />
+                <Info label="联系状态" value={contactStatus} />
+                <Info label="匹配等级" value={matchLevel} />
                 <Info label="生命周期状态" value={lead.status} />
+                <Info label="最后核验时间" value={formatDate(lead.contactVerifiedAt)} />
                 <Info label="联系方式验证状态" value={lead.contactVerificationStatus} />
                 <Info label="联系方式来源" value={lead.contactSourceUrl} />
               </div>
@@ -79,7 +88,7 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
                 <Info label="可能需要的塑料件" value={lead.potentialPlasticParts} large />
                 <Info label="个性化依据" value={lead.personalizationReason} large />
                 <Info label="官网公开页面摘要" value={lead.websiteSnapshot || "尚未记录官网研究结果。"} large />
-                <Info label="备注" value={lead.notes} large />
+                <Info label="备注" value={parsedNotes.visibleNotes} large />
               </div>
             </div>
 

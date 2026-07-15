@@ -1,6 +1,13 @@
 import { parseLeadCsvPreview } from "@/features/lead-dev/lib/csv";
 import { isValidEmail } from "@/features/lead-dev/lib/email-validation";
 import { jsonError, withLeadDevApi } from "@/features/lead-dev/lib/api";
+import {
+  buildLeadNotes,
+  normalizeContactStatus,
+  normalizeSourceType,
+  priorityFromMatchLevel,
+  statusFromContactStatus
+} from "@/features/lead-dev/lib/lead-metadata";
 import { prisma } from "@/features/lead-dev/lib/prisma";
 
 export async function POST(request: Request) {
@@ -35,9 +42,15 @@ export async function POST(request: Request) {
           publicPhone: row.publicPhone || null,
           contactPerson: row.contactPerson || null,
           sourceUrl: row.sourceUrl || null,
-          priority: row.priority || "MEDIUM",
+          priority: priorityFromMatchLevel(row.matchLevel),
           productCategory: row.productCategory || null,
-          notes: row.notes || null,
+          status: row.contactStatus ? statusFromContactStatus(row.contactStatus) : "NEW",
+          contactVerifiedAt: parseDateOrNull(row.contactVerifiedAt),
+          notes: buildLeadNotes(row.notes, {
+            sourceType: normalizeSourceType(row.sourceType),
+            wechat: row.wechat || undefined,
+            contactStatus: normalizeContactStatus(row.contactStatus) || undefined
+          }),
           contactVerificationStatus: row.publicEmail && !isValidEmail(row.publicEmail) ? "INVALID" : "UNVERIFIED"
         }
       });
@@ -46,4 +59,10 @@ export async function POST(request: Request) {
 
     return Response.json({ success: true, created, skipped });
   });
+}
+
+function parseDateOrNull(value: string) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
 }
