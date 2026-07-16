@@ -632,15 +632,29 @@ test("CRM project has no scheduled sender or Vercel cron configuration", () => {
 
 test("CRM shell follows compact SaaS navigation architecture", () => {
   const source = readFileSync("src/features/lead-dev/components/CrmShell.tsx", "utf8");
+  const styles = readFileSync("src/app/globals.css", "utf8");
 
+  assert.match(source, /crm-layout/);
+  assert.match(source, /crm-sidebar/);
+  assert.match(source, /crm-main/);
   assert.match(source, /w-\[220px\]/);
+  assert.match(source, /min-w-0/);
+  assert.doesNotMatch(source, /lg:pl-56/);
+  assert.doesNotMatch(source, /className="fixed inset-y-0 left-0 z-40 hidden w-\[220px\]/);
+  assert.match(styles, /grid-template-columns:\s*220px minmax\(0,\s*1fr\)/);
+  assert.match(styles, /\.crm-sidebar\s*{[\s\S]*?display:\s*none/);
+  assert.match(styles, /@media \(min-width:\s*1024px\)[\s\S]*?\.crm-sidebar\s*{[\s\S]*?display:\s*flex/);
+  assert.match(styles, /\.crm-main\s*{[\s\S]*?min-width:\s*0/);
   assert.match(source, /bg-slate-950/);
   assert.match(source, /CRM 搜索/);
   assert.match(source, /搜索客户、联系人、邮箱/);
   for (const label of ["仪表盘", "客户线索", "跟进中心", "今日待办", "邮件草稿", "拒绝名单", "导入导出", "系统设置"]) {
     assert.match(source, new RegExp(label));
   }
-  assert.match(source, /lg:hidden/);
+  assert.match(source, /crm-mobile-menu-button/);
+  assert.match(source, /crm-mobile-drawer/);
+  assert.match(styles, /\.crm-mobile-menu-button\s*{[\s\S]*?display:\s*inline-flex/);
+  assert.match(styles, /@media \(min-width:\s*1024px\)[\s\S]*?\.crm-mobile-menu-button,[\s\S]*?\.crm-mobile-drawer\s*{[\s\S]*?display:\s*none/);
   assert.match(source, /menuOpen/);
 });
 

@@ -87,3 +87,48 @@ a {
     transition-duration: 0.01ms !important;
   }
 }
+
+.crm-layout {
+  min-width: 0;
+}
+
+.crm-sidebar {
+  display: none;
+}
+
+.crm-main {
+  min-width: 0;
+}
+
+.crm-mobile-menu-button {
+  display: inline-flex;
+}
+
+.crm-mobile-drawer {
+  display: block;
+}
+
+@media (min-width: 1024px) {
+  .crm-layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .crm-sidebar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    height: 100vh;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+
+  .crm-main {
+    min-width: 0;
+  }
+
+  .crm-mobile-menu-button,
+  .crm-mobile-drawer {
+    display: none;
+  }
+}

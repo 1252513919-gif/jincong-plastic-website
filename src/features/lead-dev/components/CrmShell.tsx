@@ -44,21 +44,20 @@ export function CrmShell({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-950">
+    <div className="crm-layout min-h-screen bg-slate-100 text-slate-950">
       <aside
-        style={{ width: 220 }}
-        className="fixed inset-y-0 left-0 z-40 hidden w-[220px] border-r border-slate-800 bg-slate-950 px-3 py-4 text-white lg:block"
+        className="crm-sidebar w-[220px] border-r border-slate-800 bg-slate-950 px-3 py-4 text-white"
       >
         <CrmBrand />
         <CrmNav pathname={pathname} />
-        <div className="absolute bottom-4 left-3 right-3 rounded-2xl border border-white/10 bg-white/[0.04] p-3">
+        <div className="mt-auto rounded-2xl border border-white/10 bg-white/[0.04] p-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Safety</p>
           <p className="mt-2 text-xs leading-5 text-slate-300">TEST_MODE=true，仅允许测试收件人，CRM 无定时发送任务。</p>
         </div>
       </aside>
 
       {menuOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/40 lg:hidden">
+        <div className="crm-mobile-drawer fixed inset-0 z-50 bg-slate-950/40">
           <div className="h-full w-[280px] bg-slate-950 px-3 py-4 text-white shadow-2xl">
             <div className="flex items-center justify-between">
               <CrmBrand compact />
@@ -76,13 +75,13 @@ export function CrmShell({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      <div className="lg:pl-56">
+      <div className="crm-main min-w-0">
         <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur-xl">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
-              className="rounded-xl border border-slate-200 p-2 text-slate-700 lg:hidden"
+              className="crm-mobile-menu-button rounded-xl border border-slate-200 p-2 text-slate-700"
               aria-label="打开菜单"
             >
               <Menu className="h-4 w-4" />
@@ -115,7 +114,7 @@ export function CrmShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="px-3 py-4 sm:px-5 lg:px-6">{children}</main>
+        <main className="min-w-0 px-3 py-4 sm:px-5 lg:px-6">{children}</main>
       </div>
     </div>
   );
