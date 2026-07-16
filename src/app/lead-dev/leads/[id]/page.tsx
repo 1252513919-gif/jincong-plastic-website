@@ -22,12 +22,12 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
 
   if (!lead) {
     return (
-      <section className="min-h-screen px-6 py-10">
-        <div className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+      <section className="space-y-4">
+        <div className="max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-700">Lead Detail</p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">未找到该客户</h1>
           <p className="mt-3 text-sm leading-6 text-slate-600">当前客户 ID 在本地客户开发数据库中不存在，可能已被删除，或列表链接不是稳定客户 ID。</p>
-          <Link href="/lead-dev/leads" className="mt-6 inline-flex rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white">
+          <Link href="/lead-dev/leads" className="mt-6 inline-flex rounded-xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
             返回客户列表
           </Link>
         </div>
@@ -59,18 +59,18 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
   ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
 
   return (
-    <section className="min-h-screen px-6 py-10">
-      <div className="mx-auto max-w-7xl">
-        <Link href="/lead-dev/leads" className="text-sm font-semibold text-sky-700">
+    <section className="space-y-4">
+      <div>
+        <Link href="/lead-dev/leads" className="text-sm font-semibold text-blue-700">
           返回客户列表
         </Link>
-        <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_420px]">
-          <div className="space-y-6">
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_390px]">
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-sky-700">企业名称</p>
-                  <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{lead.companyName}</h1>
+                  <p className="text-sm font-medium text-slate-500">客户详情 / 企业名称</p>
+                  <h1 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-slate-950">{lead.companyName}</h1>
                   <p className="mt-2 text-sm text-slate-600">
                     {lead.industry || "未填写行业"} / {lead.region || "未填写地区"}
                   </p>
@@ -99,8 +99,8 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
               </div>
             </div>
 
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-950">客户研究信息</h2>
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="text-base font-semibold text-slate-950">客户研究信息</h2>
               <div className="mt-5 grid gap-4 md:grid-cols-2">
                 <Info label="主营产品摘要" value={lead.productSummary} large />
                 <Info label="可能需要的塑料件" value={lead.potentialPlasticParts} large />
@@ -110,7 +110,7 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
               </div>
             </div>
 
-            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <h2 className="text-lg font-semibold text-slate-950">沟通时间轴</h2>
@@ -126,7 +126,7 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
               <div className="mt-5 space-y-4">
                 {timelineItems.map((item) => (
                   <div key={item.id} className="relative border-l border-slate-200 pl-5">
-                    <span className="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full bg-slate-900" />
+                    <span className="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full bg-blue-500" />
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <p className="text-sm font-semibold text-slate-950">{item.title}</p>
@@ -144,8 +144,8 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
               </div>
             </div>
 
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-950">开发信草稿记录</h2>
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="text-base font-semibold text-slate-950">开发信草稿记录</h2>
               <div className="mt-4 space-y-4">
                 {lead.drafts.map((draft) => (
                   <div key={draft.id} className="rounded-2xl border border-slate-200 p-4">
@@ -164,8 +164,8 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
               </div>
             </div>
 
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-950">跟进记录</h2>
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="text-base font-semibold text-slate-950">跟进记录</h2>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <Info label="上次联系时间" value={formatDate(lead.lastContactedAt)} />
                 <Info label="是否已跟进" value={lead.hasFollowedUp ? "是" : "否"} />

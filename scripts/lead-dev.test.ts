@@ -637,6 +637,10 @@ test("CRM shell follows compact SaaS navigation architecture", () => {
   assert.match(source, /crm-layout/);
   assert.match(source, /crm-sidebar/);
   assert.match(source, /crm-main/);
+  assert.match(source, /navSections/);
+  assert.match(source, /crm-account/);
+  assert.match(source, /action="\/lead-dev\/leads"/);
+  assert.match(source, /name="q"/);
   assert.match(source, /w-\[220px\]/);
   assert.match(source, /min-w-0/);
   assert.doesNotMatch(source, /lg:pl-56/);
@@ -648,6 +652,8 @@ test("CRM shell follows compact SaaS navigation architecture", () => {
   assert.match(source, /bg-slate-950/);
   assert.match(source, /CRM 搜索/);
   assert.match(source, /搜索客户、联系人、邮箱/);
+  assert.doesNotMatch(source, /Safety/);
+  assert.doesNotMatch(source, /SAFETY/);
   for (const label of ["仪表盘", "客户线索", "跟进中心", "今日待办", "邮件草稿", "拒绝名单", "导入导出", "系统设置"]) {
     assert.match(source, new RegExp(label));
   }
@@ -661,12 +667,16 @@ test("CRM shell follows compact SaaS navigation architecture", () => {
 test("CRM dashboard exposes dense lead and activity metrics", () => {
   const source = readFileSync("src/app/lead-dev/page.tsx", "utf8");
 
-  for (const label of ["客户总数", "本周新增", "待联系", "已联系", "已回复", "有意向", "待报价", "超期跟进", "今日待办", "来源分布", "行业分布", "近期活动"]) {
+  for (const label of ["待联系", "超期跟进", "有意向", "待报价", "今日待办", "客户阶段漏斗", "今日任务", "最近客户", "近期沟通", "来源分布", "行业分布"]) {
     assert.match(source, new RegExp(label));
   }
+  assert.match(source, /priorityMetrics/);
+  assert.match(source, /stageRows/);
+  assert.match(source, /percentage/);
   assert.match(source, /followUpRecord\.count/);
   assert.match(source, /sourceDistribution/);
   assert.match(source, /industryDistribution/);
+  assert.doesNotMatch(source, /bg-slate-900/);
 });
 
 test("lead table is dense with sticky header, fixed first column, pagination, and no-wrap status tags", () => {

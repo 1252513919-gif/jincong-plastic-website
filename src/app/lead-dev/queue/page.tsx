@@ -16,22 +16,28 @@ export default async function QueuePage() {
   const smtpPassStatus = getSmtpPassStatus();
 
   return (
-    <section className="min-h-screen px-6 py-10">
-      <div className="mx-auto max-w-7xl">
-        <h1 className="text-3xl font-semibold text-slate-950">发送队列</h1>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
-          本地 MVP 每次只允许发送一封已批准邮件。当前保持 TEST_MODE=true；测试模式下不会把邮件发送到真实客户邮箱，最终收件人会替换为 TEST_RECIPIENT。
-        </p>
-        <div className="mt-6 grid gap-4 md:grid-cols-4">
-          <Card label="测试模式" value={setting.testMode ? "ON" : "OFF"} />
-          <Card label="今日额度" value={`${sentToday}/${setting.dailySendLimit}`} />
-          <Card label="TEST_RECIPIENT" value={testRecipientStatus} />
-          <Card label="SMTP_PASS" value={smtpPassStatus} />
+    <section className="space-y-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-sm font-medium text-slate-500">邮件辅助</p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-slate-950">邮件草稿</h1>
+          <p className="mt-1 text-sm text-slate-500">每次只允许发送一封已批准邮件；客户线索、跟进和今日待办优先。</p>
         </div>
+      </div>
+      <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
+        TEST_MODE=true 时，最终收件人会替换为 TEST_RECIPIENT，不会发送到真实客户邮箱。
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-4">
+        <Card label="测试模式" value={setting.testMode ? "ON" : "OFF"} />
+        <Card label="今日额度" value={`${sentToday}/${setting.dailySendLimit}`} />
+        <Card label="TEST_RECIPIENT" value={testRecipientStatus} />
+        <Card label="SMTP_PASS" value={smtpPassStatus} />
+      </div>
         <QueueActions />
-        <div className="mt-6 space-y-4">
+        <div className="space-y-3">
           {drafts.map((draft) => (
-            <div key={draft.id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div key={draft.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-slate-950">客户名称：{draft.lead.companyName}</p>
@@ -48,16 +54,15 @@ export default async function QueuePage() {
               <QueueDraftActions draftId={draft.id} status={draft.status} />
             </div>
           ))}
-          {drafts.length === 0 && <p className="rounded-3xl bg-white p-6 text-sm text-slate-500">暂无待审核或已批准草稿。</p>}
+          {drafts.length === 0 && <p className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500">暂无待审核或已批准草稿。</p>}
         </div>
-      </div>
     </section>
   );
 }
 
 function Card({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
       <p className="text-sm text-slate-500">{label}</p>
       <p className="mt-2 text-2xl font-semibold text-slate-950">{value}</p>
     </div>

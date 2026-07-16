@@ -20,19 +20,16 @@ export function QueueActions() {
   }
 
   return (
-    <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p className="text-sm leading-6 text-slate-600">
-        TEST_MODE=true 时，实际测试收件人会被替换为 TEST_RECIPIENT；如果 TEST_RECIPIENT 或 SMTP_PASS 仍是占位值，发送接口会拒绝发送。
-      </p>
-      <div className="mt-4 flex flex-wrap gap-3">
-        <button onClick={() => post("/api/lead-dev/queue/send-next")} className="rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="flex flex-wrap gap-2">
+        <button onClick={() => post("/api/lead-dev/queue/send-next")} className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-slate-50">
           发送下一封已批准邮件
         </button>
-        <button onClick={() => post("/api/lead-dev/settings", { action: "pause" })} className="rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold">暂停</button>
-        <button onClick={() => post("/api/lead-dev/settings", { action: "resume" })} className="rounded-full border border-slate-300 px-5 py-3 text-sm font-semibold">恢复</button>
-        <button onClick={() => post("/api/lead-dev/settings", { action: "stopAll" })} className="rounded-full border border-red-200 px-5 py-3 text-sm font-semibold text-red-700">立即停止全部发送</button>
+        <button onClick={() => post("/api/lead-dev/settings", { action: "pause" })} className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50">暂停</button>
+        <button onClick={() => post("/api/lead-dev/settings", { action: "resume" })} className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50">恢复</button>
+        <button onClick={() => post("/api/lead-dev/settings", { action: "stopAll" })} className="rounded-xl border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50">立即停止全部发送</button>
       </div>
-      {message && <p className="mt-4 rounded-2xl bg-slate-950 p-4 text-sm text-white">{message}</p>}
+      {message && <p className="mt-3 rounded-xl bg-slate-100 p-3 text-sm text-slate-700">{message}</p>}
     </div>
   );
 }

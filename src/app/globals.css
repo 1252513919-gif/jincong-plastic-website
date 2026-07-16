@@ -90,14 +90,18 @@ a {
 
 .crm-layout {
   min-width: 0;
+  background: #f5f7fa;
 }
 
 .crm-sidebar {
   display: none;
+  background: #0b1220;
+  color: #ffffff;
 }
 
 .crm-main {
   min-width: 0;
+  background: #f5f7fa;
 }
 
 .crm-mobile-menu-button {
@@ -106,6 +110,12 @@ a {
 
 .crm-mobile-drawer {
   display: block;
+}
+
+.crm-top-search,
+.crm-toolbar-action,
+.crm-toolbar-account {
+  display: none;
 }
 
 @media (min-width: 1024px) {
@@ -130,5 +140,17 @@ a {
   .crm-mobile-menu-button,
   .crm-mobile-drawer {
     display: none;
+  }
+
+  .crm-top-search {
+    display: flex;
+  }
+
+  .crm-toolbar-action {
+    display: inline-flex;
+  }
+
+  .crm-toolbar-account {
+    display: flex;
   }
 }

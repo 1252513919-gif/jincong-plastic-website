@@ -65,36 +65,37 @@ export default async function LeadListPage({ searchParams }: { searchParams: Pro
 
   return (
     <section className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-[-0.02em] text-slate-950">客户线索</h1>
+          <p className="text-sm font-medium text-slate-500">客户线索池</p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-slate-950">客户线索</h1>
           <p className="mt-1 text-sm text-slate-500">按行业、地区、来源、联系状态和匹配等级筛选；邮件功能保留为辅助。</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700">列设置</button>
-          <a href={exportHref} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700">
+          <button className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm">列设置</button>
+          <a href={exportHref} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm">
             批量导出 CSV
           </a>
         </div>
       </div>
 
       <form className="grid gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm md:grid-cols-4 xl:grid-cols-7">
-        <input name="q" defaultValue={q} placeholder="搜索企业名称" className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
-        <input name="industry" defaultValue={industry} placeholder="行业" className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
-        <input name="region" defaultValue={region} placeholder="地区" className="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
-        <select name="sourceType" defaultValue={sourceType} className="rounded-xl border border-slate-200 px-3 py-2 text-sm">
+        <input name="q" defaultValue={q} placeholder="搜索企业名称" className="h-10 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100" />
+        <input name="industry" defaultValue={industry} placeholder="行业" className="h-10 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100" />
+        <input name="region" defaultValue={region} placeholder="地区" className="h-10 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100" />
+        <select name="sourceType" defaultValue={sourceType} className="h-10 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100">
           <option value="">全部来源</option>
           {leadSourceTypes.map((item) => <option key={item} value={item}>{item}</option>)}
         </select>
-        <select name="contactStatus" defaultValue={contactStatus} className="rounded-xl border border-slate-200 px-3 py-2 text-sm">
+        <select name="contactStatus" defaultValue={contactStatus} className="h-10 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100">
           <option value="">全部联系状态</option>
           {leadContactStatuses.map((item) => <option key={item} value={item}>{item}</option>)}
         </select>
-        <select name="matchLevel" defaultValue={matchLevel} className="rounded-xl border border-slate-200 px-3 py-2 text-sm">
+        <select name="matchLevel" defaultValue={matchLevel} className="h-10 rounded-xl border border-slate-200 px-3 text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100">
           <option value="">全部匹配等级</option>
           {leadMatchLevels.map((item) => <option key={item} value={item}>{item}</option>)}
         </select>
-        <button className="rounded-xl bg-slate-950 px-3 py-2 text-sm font-semibold text-white">筛选</button>
+        <button className="h-10 rounded-xl bg-slate-950 px-3 text-sm font-semibold text-white shadow-sm">筛选</button>
       </form>
 
       <div id="lead-import-export">
@@ -106,7 +107,7 @@ export default async function LeadListPage({ searchParams }: { searchParams: Pro
           <span>共 {filteredLeads.length} 条，当前第 {safePage}/{totalPages} 页</span>
           <span className="font-medium text-slate-700">批量选择：勾选后可导出给企业微信跟进</span>
         </div>
-        <div className="max-w-full overflow-x-auto">
+        <div data-crm-table-scroll className="max-w-full overflow-x-auto">
           <table className="w-full min-w-[1280px] border-separate border-spacing-0 text-left text-sm">
             <thead className="sticky top-0 z-20 bg-slate-50 text-xs uppercase tracking-[0.08em] text-slate-500">
               <tr>
@@ -125,12 +126,12 @@ export default async function LeadListPage({ searchParams }: { searchParams: Pro
             </thead>
             <tbody>
               {leads.map((lead) => (
-                <tr key={lead.id} className="group cursor-pointer hover:bg-slate-50">
-                  <td className="sticky left-0 z-10 border-b border-slate-100 bg-white px-3 py-3 group-hover:bg-slate-50">
+                <tr key={lead.id} className="group cursor-pointer hover:bg-blue-50/40">
+                  <td className="sticky left-0 z-10 border-b border-slate-100 bg-white px-3 py-3 group-hover:bg-blue-50">
                     <input type="checkbox" aria-label={`选择 ${lead.companyName}`} />
                   </td>
-                  <td className="sticky left-10 z-10 min-w-[220px] max-w-[260px] border-b border-slate-100 bg-white px-4 py-3 group-hover:bg-slate-50">
-                    <Link href={`/lead-dev/leads/${lead.id}`} className="line-clamp-2 font-semibold leading-5 text-slate-950 hover:text-sky-700">
+                  <td className="sticky left-10 z-10 min-w-[220px] max-w-[260px] border-b border-slate-100 bg-white px-4 py-3 group-hover:bg-blue-50">
+                    <Link href={`/lead-dev/leads/${lead.id}`} className="line-clamp-2 font-semibold leading-5 text-slate-950 hover:text-blue-700">
                       {lead.companyName}
                     </Link>
                     {lead.website && <p className="mt-1 truncate text-xs text-slate-500">{lead.website}</p>}
@@ -151,7 +152,7 @@ export default async function LeadListPage({ searchParams }: { searchParams: Pro
                     <p className="whitespace-nowrap">{lead.publicPhone || "-"}</p>
                     <p className="mt-1 max-w-[220px] truncate text-xs text-slate-500">{lead.publicEmail || "-"}</p>
                   </td>
-                  <td className="border-b border-slate-100 px-4 py-3"><Badge>{lead.contactStatus}</Badge></td>
+                  <td className="border-b border-slate-100 px-4 py-3"><Badge tone="blue">{lead.contactStatus}</Badge></td>
                   <td className="border-b border-slate-100 px-4 py-3"><Badge>{lead.matchLevel}</Badge></td>
                   <td className="border-b border-slate-100 px-4 py-3 text-slate-600">
                     <p className="whitespace-nowrap">{formatDate(lead.latestFollowUp?.scheduledAt || lead.lastContactedAt)}</p>
@@ -177,8 +178,9 @@ export default async function LeadListPage({ searchParams }: { searchParams: Pro
   );
 }
 
-function Badge({ children }: { children: React.ReactNode }) {
-  return <span className="inline-flex whitespace-nowrap rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">{children}</span>;
+function Badge({ children, tone = "slate" }: { children: React.ReactNode; tone?: "slate" | "blue" }) {
+  const classes = tone === "blue" ? "bg-blue-50 text-blue-700" : "bg-slate-100 text-slate-700";
+  return <span className={`inline-flex whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${classes}`}>{children}</span>;
 }
 
 function PaginationLink({
