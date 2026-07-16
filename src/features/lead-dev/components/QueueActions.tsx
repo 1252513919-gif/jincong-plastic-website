@@ -41,6 +41,8 @@ export function QueueDraftActions({ draftId, status }: { draftId: string; status
   const router = useRouter();
   const [message, setMessage] = useState("");
   const [pendingAction, setPendingAction] = useState<"approve" | "reject" | null>(null);
+  const reviewButtonClass =
+    "inline-flex h-10 min-w-[112px] items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-500";
 
   async function patch(action: "approve" | "reject") {
     setMessage("");
@@ -67,17 +69,17 @@ export function QueueDraftActions({ draftId, status }: { draftId: string; status
             type="button"
             disabled={pendingAction !== null}
             onClick={() => patch("approve")}
-            className="rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold !text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-500 disabled:opacity-60 disabled:!text-white"
+            className={reviewButtonClass}
           >
-            {pendingAction === "approve" ? "审核中..." : "审核通过"}
+            {pendingAction === "approve" ? "审核中…" : "审核通过"}
           </button>
           <button
             type="button"
             disabled={pendingAction !== null}
             onClick={() => patch("reject")}
-            className="rounded-full border border-red-200 px-5 py-2 text-sm font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+            className={reviewButtonClass}
           >
-            {pendingAction === "reject" ? "处理中..." : "拒绝草稿"}
+            {pendingAction === "reject" ? "审核中…" : "拒绝草稿"}
           </button>
         </>
       )}

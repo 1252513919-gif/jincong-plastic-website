@@ -562,11 +562,13 @@ test("pending review approve button has visible text and clear states", () => {
   const source = readFileSync("src/features/lead-dev/components/QueueActions.tsx", "utf8");
 
   assert.match(source, /审核通过/);
-  assert.match(source, /bg-slate-950/);
-  assert.match(source, /!text-white/);
-  assert.match(source, /hover:bg-slate-800/);
+  assert.match(source, /reviewButtonClass/);
+  assert.match(source, /bg-white/);
+  assert.match(source, /text-slate-900/);
+  assert.match(source, /hover:bg-slate-50/);
   assert.match(source, /disabled:cursor-not-allowed/);
-  assert.match(source, /disabled:opacity-60/);
+  assert.match(source, /disabled:bg-slate-100/);
+  assert.match(source, /disabled:text-slate-500/);
   assert.match(source, /pendingAction === "approve"/);
 });
 
@@ -626,4 +628,70 @@ test("CRM project has no scheduled sender or Vercel cron configuration", () => {
   assert.doesNotMatch(vercelConfig, /"crons"/i);
   assert.match(sendNextRoute, /export async function POST/);
   assert.doesNotMatch(sendNextRoute, /export async function GET/);
+});
+
+test("CRM shell follows compact SaaS navigation architecture", () => {
+  const source = readFileSync("src/features/lead-dev/components/CrmShell.tsx", "utf8");
+
+  assert.match(source, /w-\[220px\]/);
+  assert.match(source, /bg-slate-950/);
+  assert.match(source, /CRM 搜索/);
+  assert.match(source, /搜索客户、联系人、邮箱/);
+  for (const label of ["仪表盘", "客户线索", "跟进中心", "今日待办", "邮件草稿", "拒绝名单", "导入导出", "系统设置"]) {
+    assert.match(source, new RegExp(label));
+  }
+  assert.match(source, /lg:hidden/);
+  assert.match(source, /menuOpen/);
+});
+
+test("CRM dashboard exposes dense lead and activity metrics", () => {
+  const source = readFileSync("src/app/lead-dev/page.tsx", "utf8");
+
+  for (const label of ["客户总数", "本周新增", "待联系", "已联系", "已回复", "有意向", "待报价", "超期跟进", "今日待办", "来源分布", "行业分布", "近期活动"]) {
+    assert.match(source, new RegExp(label));
+  }
+  assert.match(source, /followUpRecord\.count/);
+  assert.match(source, /sourceDistribution/);
+  assert.match(source, /industryDistribution/);
+});
+
+test("lead table is dense with sticky header, fixed first column, pagination, and no-wrap status tags", () => {
+  const source = readFileSync("src/app/lead-dev/leads/page.tsx", "utf8");
+
+  assert.match(source, /overflow-x-auto/);
+  assert.match(source, /sticky top-0/);
+  assert.match(source, /sticky left-0/);
+  assert.match(source, /min-w-\[220px\]/);
+  assert.match(source, /max-w-\[260px\]/);
+  assert.match(source, /line-clamp-2/);
+  assert.match(source, /whitespace-nowrap/);
+  assert.match(source, /pageSize/);
+  assert.match(source, /skip/);
+  assert.match(source, /列设置/);
+  assert.match(source, /批量选择/);
+});
+
+test("lead detail page presents follow-up records as a communication timeline", () => {
+  const source = readFileSync("src/app/lead-dev/leads/[id]/page.tsx", "utf8");
+
+  assert.match(source, /沟通时间轴/);
+  assert.match(source, /timelineItems/);
+  assert.match(source, /电话/);
+  assert.match(source, /微信/);
+  assert.match(source, /邮件/);
+  assert.match(source, /拜访/);
+  assert.match(source, /下一步/);
+  assert.match(source, /下次跟进/);
+});
+
+test("queue review buttons use matching light outline styles and readable disabled loading copy", () => {
+  const source = readFileSync("src/features/lead-dev/components/QueueActions.tsx", "utf8");
+
+  assert.match(source, /reviewButtonClass/);
+  assert.match(source, /bg-white/);
+  assert.match(source, /border-slate-300/);
+  assert.match(source, /text-slate-900/);
+  assert.match(source, /审核中…/);
+  assert.match(source, /disabled:text-slate-500/);
+  assert.doesNotMatch(source, /bg-slate-950[^`"]*审核通过/);
 });

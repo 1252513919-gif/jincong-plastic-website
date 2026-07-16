@@ -39,6 +39,24 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
   const parsedNotes = parseLeadNotes(lead.notes);
   const contactStatus = deriveContactStatus(lead.status, parsedNotes.metadata.contactStatus);
   const matchLevel = matchLevelFromPriority(lead.priority);
+  const timelineItems = [
+    ...lead.followUpRecords.map((record) => ({
+      id: `follow-${record.id}`,
+      time: record.completedAt || record.scheduledAt || record.createdAt,
+      title: `${methodLabel(record.method)} / ${statusLabel(record.status)}`,
+      note: record.note,
+      nextAction: record.nextAction,
+      scheduledAt: record.scheduledAt
+    })),
+    ...lead.logs.map((log) => ({
+      id: `mail-${log.id}`,
+      time: log.sentAt || log.createdAt,
+      title: `邮件 / ${log.status}`,
+      note: log.subject,
+      nextAction: log.errorMessage,
+      scheduledAt: null
+    }))
+  ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
 
   return (
     <section className="min-h-screen px-6 py-10">
@@ -89,6 +107,40 @@ export default async function LeadDetailPage({ params }: LeadDetailPageProps) {
                 <Info label="个性化依据" value={lead.personalizationReason} large />
                 <Info label="官网公开页面摘要" value={lead.websiteSnapshot || "尚未记录官网研究结果。"} large />
                 <Info label="备注" value={parsedNotes.visibleNotes} large />
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-950">沟通时间轴</h2>
+                  <p className="mt-1 text-sm text-slate-500">统一展示电话、微信、邮件、拜访记录、反馈、下一步和下次跟进。</p>
+                </div>
+                <div className="flex gap-2 text-xs font-semibold text-slate-500">
+                  <span>电话</span>
+                  <span>微信</span>
+                  <span>邮件</span>
+                  <span>拜访</span>
+                </div>
+              </div>
+              <div className="mt-5 space-y-4">
+                {timelineItems.map((item) => (
+                  <div key={item.id} className="relative border-l border-slate-200 pl-5">
+                    <span className="absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full bg-slate-900" />
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-950">{item.title}</p>
+                        <p className="mt-1 text-xs text-slate-500">下次跟进：{formatDate(item.scheduledAt) || "-"}</p>
+                      </div>
+                      <span className="whitespace-nowrap rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                        {formatDate(item.time)}
+                      </span>
+                    </div>
+                    {item.note && <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600">沟通内容：{item.note}</p>}
+                    {item.nextAction && <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-slate-500">下一步：{item.nextAction}</p>}
+                  </div>
+                ))}
+                {timelineItems.length === 0 && <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">暂无沟通记录。</p>}
               </div>
             </div>
 
