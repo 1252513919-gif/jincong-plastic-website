@@ -515,6 +515,9 @@ test("lead dev database-backed pages are dynamic and not prerendered at build ti
     "src/app/lead-dev/leads/[id]/page.tsx",
     "src/app/lead-dev/queue/page.tsx",
     "src/app/lead-dev/follow-ups/page.tsx",
+    "src/app/lead-dev/today/page.tsx",
+    "src/app/lead-dev/import-export/page.tsx",
+    "src/app/lead-dev/settings/page.tsx",
     "src/app/lead-dev/suppression/page.tsx"
   ]) {
     const source = readFileSync(file, "utf8");
@@ -662,6 +665,25 @@ test("CRM shell follows compact SaaS navigation architecture", () => {
   assert.match(styles, /\.crm-mobile-menu-button\s*{[\s\S]*?display:\s*inline-flex/);
   assert.match(styles, /@media \(min-width:\s*1024px\)[\s\S]*?\.crm-mobile-menu-button,[\s\S]*?\.crm-mobile-drawer\s*{[\s\S]*?display:\s*none/);
   assert.match(source, /menuOpen/);
+});
+
+test("CRM sidebar links use real pages instead of anchor-only placeholders", () => {
+  const shell = readFileSync("src/features/lead-dev/components/CrmShell.tsx", "utf8");
+  const leadsPage = readFileSync("src/app/lead-dev/leads/page.tsx", "utf8");
+  const importPage = readFileSync("src/app/lead-dev/import-export/page.tsx", "utf8");
+  const settingsPage = readFileSync("src/app/lead-dev/settings/page.tsx", "utf8");
+
+  assert.match(shell, /href: "\/lead-dev\/today"/);
+  assert.match(shell, /href: "\/lead-dev\/import-export"/);
+  assert.match(shell, /href: "\/lead-dev\/settings"/);
+  assert.doesNotMatch(shell, /lead-import-export|queue#settings|follow-ups#today/);
+  assert.match(shell, /prefetch/);
+  assert.match(shell, /pendingHref/);
+  assert.match(shell, /crm-route-progress/);
+  assert.doesNotMatch(leadsPage, /LeadImportPanel/);
+  assert.match(importPage, /LeadImportPanel/);
+  assert.match(settingsPage, /TEST_MODE/);
+  assert.doesNotMatch(settingsPage, /SMTP_PASS|LEAD_DEV_SESSION_SECRET|DATABASE_URL|PASSWORD_HASH/);
 });
 
 test("CRM dashboard exposes dense lead and activity metrics", () => {

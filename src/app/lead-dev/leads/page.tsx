@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { prisma } from "@/features/lead-dev/lib/prisma";
-import { LeadImportPanel } from "@/features/lead-dev/components/LeadImportPanel";
 import {
   deriveContactStatus,
   leadContactStatuses,
@@ -97,10 +96,6 @@ export default async function LeadListPage({ searchParams }: { searchParams: Pro
         </select>
         <button className="h-10 rounded-xl bg-slate-950 px-3 text-sm font-semibold text-white shadow-sm">筛选</button>
       </form>
-
-      <div id="lead-import-export">
-        <LeadImportPanel />
-      </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 text-sm text-slate-500">

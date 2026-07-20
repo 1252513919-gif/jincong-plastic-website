@@ -58,7 +58,7 @@ export default async function LeadDevDashboardPage() {
     { label: "超期跟进", value: overdueFollowUps, href: "/lead-dev/follow-ups", tone: "red" },
     { label: "有意向", value: interested, href: "/lead-dev/leads?contactStatus=有意向", tone: "green" },
     { label: "待报价", value: quotePending, href: "/lead-dev/queue", tone: "amber" },
-    { label: "今日待办", value: todayTodoCount, href: "/lead-dev/follow-ups#today", tone: "slate" }
+    { label: "今日待办", value: todayTodoCount, href: "/lead-dev/today", tone: "slate" }
   ];
 
   const stageRows = [

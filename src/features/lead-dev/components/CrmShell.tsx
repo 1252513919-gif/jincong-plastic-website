@@ -2,12 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BarChart3,
   CalendarCheck,
   ChevronDown,
-  Database,
   Inbox,
   LayoutList,
   Menu,
@@ -25,7 +24,7 @@ const navSections = [
     label: "工作台",
     items: [
       { href: "/lead-dev", label: "仪表盘", icon: BarChart3 },
-      { href: "/lead-dev/follow-ups#today", label: "今日待办", icon: CalendarCheck }
+      { href: "/lead-dev/today", label: "今日待办", icon: CalendarCheck }
     ]
   },
   {
@@ -45,8 +44,8 @@ const navSections = [
   {
     label: "数据",
     items: [
-      { href: "/lead-dev/leads#lead-import-export", label: "导入导出", icon: Upload },
-      { href: "/lead-dev/queue#settings", label: "系统设置", icon: Settings }
+      { href: "/lead-dev/import-export", label: "导入导出", icon: Upload },
+      { href: "/lead-dev/settings", label: "系统设置", icon: Settings }
     ]
   }
 ];
@@ -56,23 +55,30 @@ const navItems = navSections.flatMap((section) => section.items);
 export function CrmShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
   const isLogin = pathname === "/lead-dev/login";
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setPendingHref(null), 0);
+    return () => window.clearTimeout(timer);
+  }, [pathname]);
 
   if (isLogin) {
     return <div className="min-h-screen bg-slate-50">{children}</div>;
   }
 
-  const activeItem = navItems.find((item) =>
-    !item.href.includes("#") && (item.href === "/lead-dev" ? pathname === item.href : pathname.startsWith(item.href))
-  );
+  const activePath = pendingHref ?? pathname;
+  const activeItem = navItems.find((item) => isActivePath(activePath, item.href));
 
   return (
     <div className="crm-layout min-h-screen bg-[#f5f7fa] text-slate-950">
       <aside className="crm-sidebar w-[220px] border-r border-slate-800 bg-[#0b1220] px-3 py-4 text-white">
         <CrmBrand />
-        <CrmNav pathname={pathname} />
+        <CrmNav pathname={activePath} onNavigate={(href) => setPendingHref(href)} />
         <CrmAccount />
       </aside>
+
+      {pendingHref && <div className="crm-route-progress fixed left-0 top-0 z-[70] h-0.5 bg-blue-500" />}
 
       {menuOpen && (
         <div className="crm-mobile-drawer fixed inset-0 z-50 bg-slate-950/45">
@@ -88,7 +94,13 @@ export function CrmShell({ children }: { children: React.ReactNode }) {
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <CrmNav pathname={pathname} onNavigate={() => setMenuOpen(false)} />
+            <CrmNav
+              pathname={activePath}
+              onNavigate={(href) => {
+                setPendingHref(href);
+                setMenuOpen(false);
+              }}
+            />
             <CrmAccount compact />
           </div>
         </div>
@@ -124,13 +136,15 @@ export function CrmShell({ children }: { children: React.ReactNode }) {
             </form>
 
             <Link
-              href="/lead-dev/leads#lead-import-export"
+              href="/lead-dev/import-export"
+              prefetch
               className="crm-toolbar-action rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm hover:bg-slate-50"
             >
               导入客户
             </Link>
             <Link
-              href="/lead-dev/follow-ups#today"
+              href="/lead-dev/today"
+              prefetch
               className="crm-toolbar-action rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-100"
             >
               今日待办
@@ -166,7 +180,7 @@ function CrmBrand({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function CrmNav({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
+function CrmNav({ pathname, onNavigate }: { pathname: string; onNavigate?: (href: string) => void }) {
   return (
     <nav className="mt-5 space-y-5">
       {navSections.map((section) => (
@@ -175,12 +189,13 @@ function CrmNav({ pathname, onNavigate }: { pathname: string; onNavigate?: () =>
           <div className="mt-2 space-y-1">
             {section.items.map((item) => {
               const Icon = item.icon;
-              const active = !item.href.includes("#") && (item.href === "/lead-dev" ? pathname === item.href : pathname.startsWith(item.href));
+              const active = isActivePath(pathname, item.href);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  onClick={onNavigate}
+                  prefetch
+                  onClick={() => onNavigate?.(item.href)}
                   className={`group flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-medium transition ${
                     active
                       ? "bg-white text-slate-950 shadow-sm"
@@ -198,6 +213,10 @@ function CrmNav({ pathname, onNavigate }: { pathname: string; onNavigate?: () =>
       ))}
     </nav>
   );
+}
+
+function isActivePath(pathname: string, href: string) {
+  return href === "/lead-dev" ? pathname === href : pathname.startsWith(href);
 }
 
 function CrmAccount({ compact = false }: { compact?: boolean }) {
