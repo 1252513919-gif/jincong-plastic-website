@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   BarChart3,
   CalendarCheck,
@@ -55,30 +55,21 @@ const navItems = navSections.flatMap((section) => section.items);
 export function CrmShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [pendingHref, setPendingHref] = useState<string | null>(null);
   const isLogin = pathname === "/lead-dev/login";
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => setPendingHref(null), 0);
-    return () => window.clearTimeout(timer);
-  }, [pathname]);
 
   if (isLogin) {
     return <div className="min-h-screen bg-slate-50">{children}</div>;
   }
 
-  const activePath = pendingHref ?? pathname;
-  const activeItem = navItems.find((item) => isActivePath(activePath, item.href));
+  const activeItem = navItems.find((item) => isActivePath(pathname, item.href));
 
   return (
     <div className="crm-layout min-h-screen bg-[#f5f7fa] text-slate-950">
       <aside className="crm-sidebar w-[220px] border-r border-slate-800 bg-[#0b1220] px-3 py-4 text-white">
         <CrmBrand />
-        <CrmNav pathname={activePath} onNavigate={(href) => setPendingHref(href)} />
+        <CrmNav pathname={pathname} />
         <CrmAccount />
       </aside>
-
-      {pendingHref && <div className="crm-route-progress fixed left-0 top-0 z-[70] h-0.5 bg-blue-500" />}
 
       {menuOpen && (
         <div className="crm-mobile-drawer fixed inset-0 z-50 bg-slate-950/45">
@@ -95,9 +86,8 @@ export function CrmShell({ children }: { children: React.ReactNode }) {
               </button>
             </div>
             <CrmNav
-              pathname={activePath}
-              onNavigate={(href) => {
-                setPendingHref(href);
+              pathname={pathname}
+              onNavigate={() => {
                 setMenuOpen(false);
               }}
             />
@@ -180,7 +170,7 @@ function CrmBrand({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function CrmNav({ pathname, onNavigate }: { pathname: string; onNavigate?: (href: string) => void }) {
+function CrmNav({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
   return (
     <nav className="mt-5 space-y-5">
       {navSections.map((section) => (
@@ -195,8 +185,8 @@ function CrmNav({ pathname, onNavigate }: { pathname: string; onNavigate?: (href
                   key={item.href}
                   href={item.href}
                   prefetch
-                  onClick={() => onNavigate?.(item.href)}
-                  className={`group flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-medium transition ${
+                  onClick={onNavigate}
+                  className={`group flex h-10 items-center gap-3 rounded-xl px-3 text-sm font-medium ${
                     active
                       ? "bg-white text-slate-950 shadow-sm"
                       : "text-slate-400 hover:bg-white/10 hover:text-white"

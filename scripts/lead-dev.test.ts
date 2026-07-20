@@ -672,18 +672,21 @@ test("CRM sidebar links use real pages instead of anchor-only placeholders", () 
   const leadsPage = readFileSync("src/app/lead-dev/leads/page.tsx", "utf8");
   const importPage = readFileSync("src/app/lead-dev/import-export/page.tsx", "utf8");
   const settingsPage = readFileSync("src/app/lead-dev/settings/page.tsx", "utf8");
+  const loadingPage = readFileSync("src/app/lead-dev/loading.tsx", "utf8");
 
   assert.match(shell, /href: "\/lead-dev\/today"/);
   assert.match(shell, /href: "\/lead-dev\/import-export"/);
   assert.match(shell, /href: "\/lead-dev\/settings"/);
   assert.doesNotMatch(shell, /lead-import-export|queue#settings|follow-ups#today/);
   assert.match(shell, /prefetch/);
-  assert.match(shell, /pendingHref/);
-  assert.match(shell, /crm-route-progress/);
+  assert.doesNotMatch(shell, /pendingHref|setPendingHref|useEffect|crm-route-progress|key=\{pathname\}/);
+  assert.doesNotMatch(shell, /transition-all|animate-pulse|opacity-/);
   assert.doesNotMatch(leadsPage, /LeadImportPanel/);
   assert.match(importPage, /LeadImportPanel/);
   assert.match(settingsPage, /TEST_MODE/);
   assert.doesNotMatch(settingsPage, /SMTP_PASS|LEAD_DEV_SESSION_SECRET|DATABASE_URL|PASSWORD_HASH/);
+  assert.match(loadingPage, /crm-content-progress/);
+  assert.doesNotMatch(loadingPage, /min-h-screen|fixed|bg-white|bg-blue|animate-pulse/);
 });
 
 test("CRM dashboard exposes dense lead and activity metrics", () => {
