@@ -25,6 +25,7 @@
     "check:images": "tsx scripts/check-product-images.ts"
   },
   "dependencies": {
+    "@google/model-viewer": "^4.3.1",
     "@prisma/client": "^6.19.0",
     "@types/pg": "^8.20.0",
     "framer-motion": "^12.42.2",

@@ -7,7 +7,6 @@ import { localizedPath } from "@/i18n/routing";
 import { CapabilityTicker } from "./CapabilityTicker";
 import { GradientButton } from "./GradientButton";
 import { getHeroContent } from "./hero-content";
-import { OrbitVisualization } from "./OrbitVisualization";
 import "@/styles/home-hero.css";
 
 const lineCount = 20;
@@ -18,6 +17,7 @@ export function HomeHero() {
 
   return (
     <section className="home-hero" aria-labelledby="home-hero-title">
+      <HeroBackgroundVideo />
       <SideLines side="left" />
       <SideLines side="right" />
 
@@ -51,12 +51,6 @@ export function HomeHero() {
           </div>
         </div>
 
-        <div className="home-hero__visual">
-          <OrbitVisualization
-            center={content.center}
-            items={content.orbit}
-          />
-        </div>
       </div>
 
       <div className="home-hero__capability-strip">
@@ -76,6 +70,22 @@ export function HomeHero() {
       </a>
       <div className="home-hero__progressive-blur" aria-hidden="true" />
     </section>
+  );
+}
+
+function HeroBackgroundVideo() {
+  return (
+    <div className="home-hero__video-bg" aria-hidden="true">
+      <video
+        src="/images/factory/hero-background.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+      />
+      <div className="home-hero__video-overlay" />
+    </div>
   );
 }
 

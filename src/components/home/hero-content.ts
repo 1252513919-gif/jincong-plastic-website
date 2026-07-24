@@ -14,17 +14,17 @@ export type HomeHeroContent = {
 
 const enHeroContent: HomeHeroContent = {
   headline: [
-    "Custom plastic parts,",
-    "crafted with precision",
-    "factory-direct."
+    "Custom Plastic",
+    "Injection Molding",
+    "Factory Direct"
   ],
   description:
-    "We manufacture custom plastic components for automotive, electronics, furniture, pet products, hardware, and industrial applications. Send us your drawing or sample to start your project.",
-  primaryCta: "Request a Quote",
+    "Custom plastic parts from drawings, samples and product photos. We support small-batch trial production, OEM/ODM and batch supply for multi-industry applications.",
+  primaryCta: "Send Requirement",
   secondaryCta: "View Products",
   ticker: [
     "Custom Injection Molding",
-    "Mold Development",
+    "Mold Support",
     "OEM / ODM",
     "Small Batch Trial",
     "Mass Production",
@@ -39,7 +39,7 @@ const enHeroContent: HomeHeroContent = {
     "Flat Washers",
     "Automotive Parts",
     "OEM / ODM",
-    "Mold Development",
+    "Mold Support",
     "Small Batch Trial",
     "Mass Production"
   ],
@@ -47,7 +47,7 @@ const enHeroContent: HomeHeroContent = {
   capabilityLabel: "Factory-direct capabilities for custom plastic parts",
   capabilities: [
     "Injection Molding",
-    "Mold Development",
+    "Mold Support",
     "Drawing Review",
     "Sample Accepted",
     "Small Batch Trial",
@@ -56,14 +56,14 @@ const enHeroContent: HomeHeroContent = {
 };
 
 const zhHeroContent: HomeHeroContent = {
-  headline: ["定制塑料件，", "精密加工，", "工厂直供。"],
+  headline: ["塑料件定制", "注塑加工", "工厂直连"],
   description:
-    "面向汽车、电子电气、家具、宠物用品、五金及工业应用提供塑料零部件加工。可发送图纸、样品或产品图片，沟通试产与批量供货方案。",
-  primaryCta: "提交需求获取报价",
-  secondaryCta: "查看产品系列",
+    "支持按图纸、样品和产品图片沟通塑料件加工需求，适合小批量试产、OEM/ODM 定制和多行业塑料零部件批量供货。",
+  primaryCta: "发送需求",
+  secondaryCta: "查看产品",
   ticker: [
     "注塑加工",
-    "模具开发",
+    "模具配套",
     "OEM / ODM",
     "小批量试产",
     "批量生产",
@@ -78,7 +78,7 @@ const zhHeroContent: HomeHeroContent = {
     "平垫与垫片",
     "汽车塑料件",
     "OEM / ODM",
-    "模具开发",
+    "模具配套",
     "小批量试产",
     "批量生产"
   ],
@@ -86,7 +86,7 @@ const zhHeroContent: HomeHeroContent = {
   capabilityLabel: "面向定制塑料件项目的工厂直连加工能力",
   capabilities: [
     "注塑加工",
-    "模具开发",
+    "模具配套",
     "图纸评估",
     "来样加工",
     "小批量试产",
