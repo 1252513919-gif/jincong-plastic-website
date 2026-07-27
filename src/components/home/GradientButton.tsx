@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import StarBorder from "@/components/StarBorder";
 
 type GradientButtonProps = {
   href: string;
@@ -8,10 +9,14 @@ type GradientButtonProps = {
 
 export function GradientButton({ href, children }: GradientButtonProps) {
   return (
-    <span className="home-hero__primary-border">
-      <Link className="home-hero__primary-button" href={href}>
-        <span>{children}</span>
-      </Link>
-    </span>
+    <StarBorder
+      as={Link}
+      href={href}
+      className="home-hero__primary-button home-hero__primary-button--star"
+      color="rgba(56, 189, 248, 0.72)"
+      speed="6s"
+    >
+      <span>{children}</span>
+    </StarBorder>
   );
 }

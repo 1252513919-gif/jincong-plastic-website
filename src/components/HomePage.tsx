@@ -8,6 +8,7 @@ import { localizedPath } from "@/i18n/routing";
 import { FloatingModelShowcase } from "./home/FloatingModelShowcase";
 import { HomeHero } from "./home/HomeHero";
 import { Reveal } from "./Reveal";
+import StarBorder from "./StarBorder";
 
 const homeCopy = {
   zh: {
@@ -166,22 +167,28 @@ export function HomePage() {
 
       <section className="bg-white py-14">
         <div className="section-shell">
-          <Reveal className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-[0_20px_70px_rgba(15,23,42,0.06)] md:p-9">
-            <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
-              <div>
-                <div className="eyebrow">Inquiry</div>
-                <h2 className="mt-3 text-3xl font-semibold tracking-normal text-slate-950">
-                  {copy.ctaTitle}
-                </h2>
+          <Reveal>
+            <StarBorder
+              className="home-final-cta rounded-[2rem] border border-slate-200 bg-white p-7 shadow-[0_20px_70px_rgba(15,23,42,0.06)] md:p-9"
+              color="rgba(56, 189, 248, 0.56)"
+              speed="8s"
+            >
+              <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
+                <div>
+                  <div className="eyebrow">Inquiry</div>
+                  <h2 className="mt-3 text-3xl font-semibold tracking-normal text-slate-950">
+                    {copy.ctaTitle}
+                  </h2>
+                </div>
+                <Link
+                  href={localizedPath(language, "/contact")}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-sky-700"
+                >
+                  {copy.cta}
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
-              <Link
-                href={localizedPath(language, "/contact")}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-sky-700"
-              >
-                {copy.cta}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+            </StarBorder>
           </Reveal>
         </div>
       </section>

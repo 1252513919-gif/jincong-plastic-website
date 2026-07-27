@@ -249,7 +249,7 @@
   --hero-button-text: #ffffff;
   --hero-border-soft: rgba(0, 0, 0, 0.08);
   --hero-green: #17c964;
-  --hero-accent: #a068ff;
+  --hero-accent: #38bdf8;
   background: #ffffff;
   color: var(--hero-text);
   font-family: "Inter", "Microsoft YaHei", "PingFang SC", sans-serif;
@@ -762,10 +762,11 @@
   letter-spacing: -0.02em;
   transition:
     box-shadow 300ms ease,
+    background-color 300ms ease,
     transform 300ms ease;
 }
 
-.home-hero__primary-button::after {
+.home-hero__primary-button:not(.star-border)::after {
   position: absolute;
   z-index: -1;
   inset: 0;
@@ -780,13 +781,30 @@
   transform: translateY(-1px);
 }
 
-.home-hero__primary-button:hover::after {
+.home-hero__primary-button:hover {
+  background: #050505;
+}
+
+.home-hero__primary-button:not(.star-border):hover::after {
   transform: translateX(0);
 }
 
 .home-hero__primary-button:focus-visible {
-  outline: 3px solid rgba(160, 104, 255, 0.34);
+  outline: 3px solid rgba(56, 189, 248, 0.28);
   outline-offset: 3px;
+}
+
+.home-hero__primary-button--star {
+  --star-border-color: rgba(56, 189, 248, 0.72);
+  box-shadow:
+    0 12px 30px rgba(15, 23, 42, 0.16),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.home-hero__primary-button--star > .star-border__content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .home-hero__orbit-wrap {
@@ -1014,6 +1032,17 @@
   text-align: center;
   transform: translate(-50%, -50%);
   backdrop-filter: blur(16px);
+}
+
+.home-model-showcase__logo--star {
+  --star-border-color: rgba(14, 165, 233, 0.58);
+}
+
+.home-model-showcase__logo--star > .star-border__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .home-model-showcase__logo-image {
@@ -1292,6 +1321,14 @@
   font-weight: 700;
   letter-spacing: -0.02em;
   box-shadow: 0 12px 34px rgba(15, 23, 42, 0.06);
+}
+
+.home-final-cta {
+  --star-border-color: rgba(56, 189, 248, 0.56);
+}
+
+.home-final-cta > .star-border__content {
+  display: block;
 }
 
 @keyframes home-model-in {

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import StarBorder from "@/components/StarBorder";
 import { ModelViewerCard } from "./ModelViewerCard";
 
 const showcaseModels = [
@@ -103,7 +104,11 @@ export function FloatingModelShowcase() {
         </div>
 
         <div className="home-model-showcase__stage">
-          <div className="home-model-showcase__logo">
+          <StarBorder
+            className="home-model-showcase__logo home-model-showcase__logo--star"
+            color="rgba(14, 165, 233, 0.58)"
+            speed="8s"
+          >
             <Image
               src="/images/logo/jincong-logo.jpg"
               alt="Jincong Plastic"
@@ -113,7 +118,7 @@ export function FloatingModelShowcase() {
             />
             <strong>JINCONG</strong>
             <span>PLASTIC</span>
-          </div>
+          </StarBorder>
 
           {showcaseModels.map((model, index) => (
             <ModelViewerCard
