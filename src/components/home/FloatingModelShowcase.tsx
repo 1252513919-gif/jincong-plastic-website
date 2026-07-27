@@ -66,11 +66,11 @@ export function FloatingModelShowcase() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
-          setLoadCount(1);
+          window.setTimeout(() => setLoadCount(1), 180);
           observer.disconnect();
         }
       },
-      { rootMargin: "80px" }
+      { rootMargin: "0px 0px -12% 0px" }
     );
 
     observer.observe(node);
@@ -82,7 +82,7 @@ export function FloatingModelShowcase() {
 
     const timer = window.setTimeout(() => {
       setLoadCount((current) => Math.min(current + 1, showcaseModels.length));
-    }, 520);
+    }, 820);
 
     return () => window.clearTimeout(timer);
   }, [loadCount]);

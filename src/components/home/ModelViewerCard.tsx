@@ -36,7 +36,7 @@ export function ModelViewerCard({
           observer.disconnect();
         }
       },
-      { rootMargin: "80px" }
+      { rootMargin: "0px 0px -10% 0px" }
     );
 
     observer.observe(node);
