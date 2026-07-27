@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
-import StarBorder from "@/components/StarBorder";
 import { ModelViewerCard } from "./ModelViewerCard";
 
 const showcaseModels = [
@@ -13,8 +12,8 @@ const showcaseModels = [
     titleZh: "电子设备外壳",
     noteEn: "Housing and enclosure references",
     noteZh: "外壳与结构件参考",
-    className: "home-model-card--top",
-    rotationSpeed: "11deg"
+    className: "home-model-card--display-top-left",
+    rotationSpeed: "5deg"
   },
   {
     src: "/models/automotive_fastener.glb",
@@ -22,8 +21,8 @@ const showcaseModels = [
     titleZh: "汽车塑料卡扣",
     noteEn: "Clips, caps and small fittings",
     noteZh: "卡扣、堵盖与小型配件",
-    className: "home-model-card--left",
-    rotationSpeed: "15deg"
+    className: "home-model-card--display-left",
+    rotationSpeed: "6deg"
   },
   {
     src: "/models/instrument_housing.glb",
@@ -31,8 +30,8 @@ const showcaseModels = [
     titleZh: "工业仪表壳体",
     noteEn: "Instrument and controller parts",
     noteZh: "仪表与控制器部件",
-    className: "home-model-card--right",
-    rotationSpeed: "9deg"
+    className: "home-model-card--display-right",
+    rotationSpeed: "4deg"
   },
   {
     src: "/models/pet_bowl_component.glb",
@@ -40,8 +39,8 @@ const showcaseModels = [
     titleZh: "宠物用品塑料件",
     noteEn: "Pet product component references",
     noteZh: "宠物用品结构件参考",
-    className: "home-model-card--bottom-left",
-    rotationSpeed: "13deg"
+    className: "home-model-card--display-front-left",
+    rotationSpeed: "5.5deg"
   },
   {
     src: "/models/handheld_device_case.glb",
@@ -49,8 +48,8 @@ const showcaseModels = [
     titleZh: "手持设备壳体",
     noteEn: "Device case and cover references",
     noteZh: "设备壳体与保护盖参考",
-    className: "home-model-card--bottom-right",
-    rotationSpeed: "17deg"
+    className: "home-model-card--display-front-right",
+    rotationSpeed: "4.5deg"
   }
 ];
 
@@ -67,7 +66,7 @@ export function FloatingModelShowcase() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
-          window.setTimeout(() => setLoadCount(1), 180);
+          window.setTimeout(() => setLoadCount(1), 260);
           observer.disconnect();
         }
       },
@@ -83,7 +82,7 @@ export function FloatingModelShowcase() {
 
     const timer = window.setTimeout(() => {
       setLoadCount((current) => Math.min(current + 1, showcaseModels.length));
-    }, 820);
+    }, 1100);
 
     return () => window.clearTimeout(timer);
   }, [loadCount]);
@@ -104,21 +103,15 @@ export function FloatingModelShowcase() {
         </div>
 
         <div className="home-model-showcase__stage">
-          <StarBorder
-            className="home-model-showcase__logo home-model-showcase__logo--star"
-            color="rgba(14, 165, 233, 0.58)"
-            speed="8s"
-          >
+          <div className="home-model-showcase__brand-mark">
             <Image
               src="/images/logo/jincong-logo.jpg"
               alt="Jincong Plastic"
-              width={132}
-              height={132}
+              width={104}
+              height={104}
               className="home-model-showcase__logo-image"
             />
-            <strong>JINCONG</strong>
-            <span>PLASTIC</span>
-          </StarBorder>
+          </div>
 
           {showcaseModels.map((model, index) => (
             <ModelViewerCard

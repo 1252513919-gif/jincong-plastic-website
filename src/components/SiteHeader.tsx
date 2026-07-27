@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { localizedPath, stripLocale } from "@/i18n/routing";
 import { site } from "@/lib/site";
+import StarBorder from "./StarBorder";
 import "@/styles/home-hero.css";
 
 export function SiteHeader() {
@@ -77,13 +78,16 @@ export function SiteHeader() {
             <Globe2 aria-hidden="true" size={16} strokeWidth={1.8} />
             {copy.altLang}
           </button>
-          <Link
+          <StarBorder
+            as={Link}
             href={localizedPath(language, "/contact")}
-            className="site-header-editorial__quote"
+            className="site-header-editorial__quote site-header-editorial__quote--star"
+            color="rgba(56, 189, 248, 0.64)"
+            speed="7s"
           >
             {quoteLabel}
             <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.8} />
-          </Link>
+          </StarBorder>
         </div>
 
         <button
@@ -145,14 +149,18 @@ export function SiteHeader() {
             <Globe2 aria-hidden="true" size={17} />
             {copy.altLang}
           </button>
-          <Link
+          <StarBorder
+            as={Link}
             href={localizedPath(language, "/contact")}
             onClick={() => setOpen(false)}
             tabIndex={open ? 0 : -1}
+            className="site-header-editorial__drawer-quote"
+            color="rgba(56, 189, 248, 0.62)"
+            speed="7s"
           >
             {quoteLabel}
             <ArrowUpRight aria-hidden="true" size={17} />
-          </Link>
+          </StarBorder>
           <p>© {new Date().getFullYear()} Jincong Plastic</p>
         </div>
       </div>
